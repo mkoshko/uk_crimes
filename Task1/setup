@@ -1,0 +1,158 @@
+#!/bin/bash
+
+QUIET_VERBOSE="-q"
+SKIP_MAVEN=0
+SKIP_JAVA=0
+SKIP_POSTGRES=0
+SKIP_GIT=0
+
+help() {
+  echo "Usage: setup [options]"
+  echo "Install java, git, maven, postgresql, set all required environment variables and start required services."
+  echo "Options:"
+  echo "  -J,       skip java installation."
+  echo "  -M,       skip maven installation."
+  echo "  -P,       skip postgresql installation."
+  echo "  -G,       skip git installation."
+  echo "  -h,       display this help and exit."
+  echo "  -v,       display non-script output."
+}
+
+parse_arguments() {
+  while getopts JMPGhv opt "$@"; do
+  case $opt in
+    v | --verbose)
+    QUIET_VERBOSE="-v"
+    ;;
+    M)
+    SKIP_MAVEN=1
+    ;;
+    P)
+    SKIP_POSTGRES=1
+    ;;
+    J)
+    SKIP_JAVA=1
+    ;;
+    G)
+    SKIP_GIT=1
+    ;;
+    h)
+    help
+    exit 0
+    ;;
+  esac
+  done
+}
+
+lang_script() {
+  echo "Setting up language variables..."
+  export LANG=en_US.UTF-8
+  export LANGUAGE=en_US.UTF-8
+  export LC_COLLATE=C
+  export LC_CTYPE=en_US.UTF-8
+  echo "Done."
+}
+
+postgres_install() {
+  if [[ $SKIP_POSTGRES = 1 ]]; then
+    echo "Skip postgres installation."
+    return 0
+  fi
+  echo "Installing postgresql10..."
+  yum "$QUIET_VERBOSE" -t -y install https://download.postgresql.org/pub/repos/yum/reporpms/EL-6-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+  yum "$QUIET_VERBOSE" -t -y install postgresql10 postgresql10-server
+  echo "Done."
+  echo "Starting postgres service..."
+  service postgresql-10 initdb
+  service postgresql-10 start
+  echo "Done."
+}
+
+maven_install() {
+  if [[ $SKIP_MAVEN = 1 ]]; then
+    echo "Skip maven installation."
+    return 0
+  fi
+
+  local MAVEN_FOLDER="apache-maven-3.6.3"
+  local MAVEN_ARCHIVE="apache-maven-3.6.3-bin.tar.gz"
+  local MAVEN_DOWNLOAD_URL="http://ftp.byfly.by/pub/apache.org/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz"
+
+  echo "Installing Apache Maven..."
+
+  if [[ ! (-f "$MAVEN_ARCHIVE") ]]; then
+    echo "Downloading archive..."
+
+    local silent="-"
+    if [[ $QUIET_VERBOSE = "-q" ]]; then
+      silent="-s"
+    fi
+    curl "$silent"O "$MAVEN_DOWNLOAD_URL"
+  else
+    echo "Archive already exists."
+  fi
+
+  if [[ ! ($?) ]]; then
+    echo "Error while downloading archive from $MAVEN_DOWNLOAD_URL"
+    return 1;
+  fi
+
+  echo "Extracting archive..."
+  tar "$VERBOSE"xzf "$MAVEN_ARCHIVE" -C /opt
+
+  if [[ ! ($?) ]]; then
+    echo "Error during extracting $MAVEN_ARCHIVE."
+    return 1
+  fi
+
+  echo "Configuring required environment variables..."
+
+  local temp=$(grep "$MAVEN_FOLDER" < /root/.bashrc)
+  if [[ -z $temp ]]; then
+    local M2_HOME="/opt/apache-maven-3.6.3"
+    echo "Setting up M2_HOME environment variable..."
+    echo "export M2_HOME=$M2_HOME" >> "/root/.bashrc"
+    echo "export PATH=${M2_HOME}/bin:${PATH}" >> "/root/.bashrc"
+    echo "Done."
+  else
+    echo "Environment variables already setted up."
+  fi
+}
+
+git_install() {
+  if [[ $SKIP_GIT = 1 ]]; then
+    echo "Skip git installation."
+    return 0
+  fi
+  echo "Installing git..."
+  yum "$QUIET_VERBOSE" -t -y install http://opensource.wandisco.com/centos/6/git/x86_64/wandisco-git-release-6-1.noarch.rpm
+  yum "$QUIET_VERBOSE" -t -y install git
+  echo "Done."
+}
+
+java_install() {
+  if [[ $SKIP_JAVA = 1 ]]; then
+    echo "Skip java installation."
+    return 0
+  fi
+  echo "Installing java..."
+  local temp=$(grep "/usr/lib/jvm/jre-1.8.0-openjdk.x86_64/jre/bin" < /root/.bashrc)
+  if [ -z $temp ]; then
+    local JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk.x86_64/jre/bin"
+    echo "Setting up JAVA_HOME environment variable..."
+    echo "export JAVA_HOME=$JAVA_HOME" >> "/root/.bashrc"
+    echo "Done."
+  fi
+
+  yum "$QUIET_VERBOSE" -t -y install java-1.8.0-openjdk
+  echo "Done."
+}
+
+parse_arguments "$@"
+lang_script
+
+java_install
+maven_install
+git_install
+postgres_install
+exec bash
