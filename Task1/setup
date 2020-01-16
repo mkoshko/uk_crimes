@@ -107,7 +107,7 @@ maven_install() {
 
   echo "Configuring required environment variables..."
 
-  local temp=$(grep "$MAVEN_FOLDER" < /root/.bashrc)
+  local temp=$(cat /root/.bashrc | grep "$MAVEN_FOLDER")
   if [[ -z $temp ]]; then
     local M2_HOME="/opt/apache-maven-3.6.3"
     echo "Setting up M2_HOME environment variable..."
@@ -137,7 +137,7 @@ java_install() {
   fi
   echo "Installing java..."
   yum "$QUIET_VERBOSE" -t -y install java-1.8.0-openjdk
-  local temp=$(grep "/usr/lib/jvm/jre-1.8.0-openjdk.x86_64/jre/bin" < /root/.bashrc)
+  local temp=$(cat /root/.bashrc | grep "/usr/lib/jvm/jre-1.8.0-openjdk.x86_64/jre/bin")
   if [ -z $temp ]; then
     local JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk.x86_64/jre/bin"
     echo "Setting up JAVA_HOME environment variable..."
