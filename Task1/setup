@@ -136,10 +136,10 @@ java_install() {
     return 0
   fi
   echo "Installing java..."
-  yum "$QUIET_VERBOSE" -t -y install java-1.8.0-openjdk
-  local temp=$(cat /root/.bashrc | grep "/usr/lib/jvm/jre-1.8.0-openjdk.x86_64/jre/bin")
+  yum "$QUIET_VERBOSE" -t -y install java-1.8.0-openjdk-devel
+  local temp=$(cat /root/.bashrc | grep "/usr/lib/jvm/java-1.8.0-openjdk.x86_64")
   if [ -z $temp ]; then
-    local JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk.x86_64/jre/bin"
+    local JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk.x86_64"
     echo "Setting up JAVA_HOME environment variable..."
     echo "export JAVA_HOME=$JAVA_HOME" >> "/root/.bashrc"
   fi
