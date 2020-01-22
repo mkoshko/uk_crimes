@@ -136,14 +136,28 @@ java_install() {
     return 0
   fi
   echo "Installing java..."
-  yum "$QUIET_VERBOSE" -t -y install java-1.8.0-openjdk-devel
-  local temp=$(cat /root/.bashrc | grep "/usr/lib/jvm/java-1.8.0-openjdk.x86_64")
-  if [ -z $temp ]; then
-    local JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk.x86_64"
+  local JAVA_ARCHIVE="openjdk-11.0.2_linux-x64_bin.tar.gz"
+  if [[ ! -e "$JAVA_ARCHIVE" ]]; then
+    echo "Downloading openjdk-11.0.2..."
+    curl -LO https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x64_bin.tar.gz
+    echo "Extracting archive..."
+    tar "$VERBOSE"xzf "$JAVA_ARCHIVE" -C /usr/lib/jvm
+    mkdir /usr/lib/jvm/jdk-11
+    mv /usr/lib/jvm/jdk-11.0.2 /usr/lib/jvm/jdk-11
+  fi
+  local java_folder="/usr/lib/jvm/jdk-11"
+  local java_home=$(cat /root/.bashrc | grep "$java_folder")
+  if [[ -z $java_home ]]; then
+    local JAVA_HOME="/usr/lib/jvm/jdk-11"
     echo "Setting up JAVA_HOME environment variable..."
     echo "export JAVA_HOME=$JAVA_HOME" >> "/root/.bashrc"
   fi
-  echo "Done."
+  local java_path=$(cat /root/.bashrc | grep "$java_folder")
+  if [[ -z $java_path ]]; then
+    echo "Setting up PATH variable..."
+    echo "export PATH=$java_folder:$PATH" >> "/root/.bashrc"
+  fi
+  echo "JDK 11 was succesfully installed."
 }
 
 parse_arguments "$@"
