@@ -104,6 +104,7 @@ maven_install() {
     echo "Error during extracting $MAVEN_ARCHIVE."
     return 1
   fi
+  rm -f "$MAVEN_ARCHIVE"
 
   echo "Configuring required environment variables..."
 
@@ -140,11 +141,13 @@ java_install() {
   if [[ ! -e "$JAVA_ARCHIVE" ]]; then
     echo "Downloading openjdk-11.0.2..."
     curl -LO https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x64_bin.tar.gz
-    echo "Extracting archive..."
-    tar "$VERBOSE"xzf "$JAVA_ARCHIVE" -C /usr/lib/jvm
-    mkdir /usr/lib/jvm/jdk-11
-    mv /usr/lib/jvm/jdk-11.0.2 /usr/lib/jvm/jdk-11
   fi
+  echo "Extracting archive..."
+  mkdir -p /usr/lib/jvm/jdk-11
+  tar "$VERBOSE"xzf "$JAVA_ARCHIVE" -C /usr/lib/jvm
+  mv /usr/lib/jvm/jdk-11.0.2/* /usr/lib/jvm/jdk-11
+  rm -rf /usr/lib/jvm/jdk-11.0.2
+  rm -f "$JAVA_ARCHIVE"
   local java_folder="/usr/lib/jvm/jdk-11"
   local java_home=$(cat /root/.bashrc | grep "$java_folder")
   if [[ -z $java_home ]]; then
@@ -152,10 +155,10 @@ java_install() {
     echo "Setting up JAVA_HOME environment variable..."
     echo "export JAVA_HOME=$JAVA_HOME" >> "/root/.bashrc"
   fi
-  local java_path=$(cat /root/.bashrc | grep "$java_folder")
+  local java_path=$(cat /root/.bashrc | grep "$java_folder/bin")
   if [[ -z $java_path ]]; then
     echo "Setting up PATH variable..."
-    echo "export PATH=$java_folder:$PATH" >> "/root/.bashrc"
+    echo "export PATH=$java_folder/bin:$PATH" >> "/root/.bashrc"
   fi
   echo "JDK 11 was succesfully installed."
 }
