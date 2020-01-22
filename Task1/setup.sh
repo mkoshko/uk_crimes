@@ -1,6 +1,7 @@
 #!/bin/bash
 
 QUIET_VERBOSE="-q"
+SILENT="-s"
 SKIP_MAVEN=0
 SKIP_JAVA=0
 SKIP_POSTGRES=0
@@ -23,6 +24,7 @@ parse_arguments() {
   case $opt in
     v | --verbose)
     QUIET_VERBOSE="-v"
+    SILENT="-"
     ;;
     M)
     SKIP_MAVEN=1
@@ -50,6 +52,13 @@ lang_script() {
   export LANGUAGE=en_US.UTF-8
   export LC_COLLATE=C
   export LC_CTYPE=en_US.UTF-8
+  echo "Done."
+}
+
+packages_install() {
+  echo "Installing required packages..."
+  yum "$QUIET_VERBOSE" -t -y install curl-devel expat-devel gettext-devel openssl-devel zlib-devel
+  yum "$QUIET_VERBOSE" -t -y install gcc perl-ExtUtils-MakeMaker
   echo "Done."
 }
 
@@ -82,12 +91,7 @@ maven_install() {
 
   if [[ ! (-f "$MAVEN_ARCHIVE") ]]; then
     echo "Downloading archive..."
-
-    local silent="-"
-    if [[ $QUIET_VERBOSE = "-q" ]]; then
-      silent="-s"
-    fi
-    curl "$silent"O "$MAVEN_DOWNLOAD_URL"
+    curl "$SILENT"LO "$MAVEN_DOWNLOAD_URL"
   else
     echo "Archive already exists."
   fi
@@ -113,7 +117,7 @@ maven_install() {
     local M2_HOME="/opt/apache-maven-3.6.3"
     echo "Setting up M2_HOME environment variable..."
     echo "export M2_HOME=$M2_HOME" >> "/root/.bashrc"
-    echo "export PATH=${M2_HOME}/bin:${PATH}" >> "/root/.bashrc"
+    echo "export PATH=$M2_HOME/bin:\$PATH" >> "/root/.bashrc"
     echo "Done."
   else
     echo "Environment variables already setted up."
@@ -125,10 +129,32 @@ git_install() {
     echo "Skip git installation."
     return 0
   fi
+  local git_archive="git-2.25.0.tar.gz"
   echo "Installing git..."
-  yum "$QUIET_VERBOSE" -t -y install http://opensource.wandisco.com/centos/6/git/x86_64/wandisco-git-release-6-1.noarch.rpm
-  yum "$QUIET_VERBOSE" -t -y install git
+  packages_install
+  if [[ ! -e "$git_archive" ]]; then
+    echo "Downloading git-2.25.0 ..."
+    curl "$SILENT"LO https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.25.0.tar.gz
+    echo "Done."
+  fi
+  echo "Extracting archive..."
+  tar "$VERBOSE"xzf git-2.25.0.tar.gz -C /usr/src
   echo "Done."
+  echo "Compiling the source code..."
+  make -C /usr/src/git-2.25.0 prefix=/usr/local/git all
+  make -C /usr/src/git-2.25.0 prefix=/usr/local/git install
+  echo "Done."
+  local git_path=$(cat /root/.bashrc | grep "/usr/local/git/bin")
+  if [[ -z $git_path ]]; then
+    echo "Setting up PATH variable..."
+    echo "export PATH=/usr/local/git/bin:\$PATH" >> "/root/.bashrc"
+    echo "Done."
+  fi
+  echo "Cleanup actions, one moment."
+  rm -f "$git_archive"
+  rm -rf /usr/src/git-2.25.0
+  echo "Done."
+  echo "Git sucessfully installed."
 }
 
 java_install() {
@@ -140,7 +166,7 @@ java_install() {
   local JAVA_ARCHIVE="openjdk-11.0.2_linux-x64_bin.tar.gz"
   if [[ ! -e "$JAVA_ARCHIVE" ]]; then
     echo "Downloading openjdk-11.0.2..."
-    curl -LO https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x64_bin.tar.gz
+    curl "$SILENT"LO https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_linux-x64_bin.tar.gz
   fi
   echo "Extracting archive..."
   mkdir -p /usr/lib/jvm/jdk-11
@@ -158,7 +184,7 @@ java_install() {
   local java_path=$(cat /root/.bashrc | grep "$java_folder/bin")
   if [[ -z $java_path ]]; then
     echo "Setting up PATH variable..."
-    echo "export PATH=$java_folder/bin:$PATH" >> "/root/.bashrc"
+    echo "export PATH=$java_folder/bin:\$PATH" >> "/root/.bashrc"
   fi
   echo "JDK 11 was succesfully installed."
 }
