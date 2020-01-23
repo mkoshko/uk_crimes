@@ -11,11 +11,10 @@ public class PropertiesReader {
     }
 
     private Properties readPropertiesFromInputStream(String filename) throws IOException {
-            InputStream inputStream = getResourceAsStream(filename);
-            Properties properties = new Properties();
-            properties.load(inputStream);
-            return properties;
-
+        InputStream inputStream = getResourceAsStream(filename);
+        Properties properties = new Properties();
+        properties.load(inputStream);
+        return properties;
     }
 
     private InputStream getResourceAsStream(String filename) {
