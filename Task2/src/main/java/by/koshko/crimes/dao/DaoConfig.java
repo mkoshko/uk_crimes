@@ -7,14 +7,17 @@ import org.codejargon.fluentjdbc.api.FluentJdbcBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Properties;
 
 @Configuration
+@EnableTransactionManagement
 @ComponentScan(basePackages = "by.koshko.crimes")
-public class Config {
+public class DaoConfig {
 
     private static final String PROPERTIES_FILE = "dataSource.properties";
 
@@ -33,5 +36,10 @@ public class Config {
         return new FluentJdbcBuilder()
                 .connectionProvider(dataSource)
                 .build();
+    }
+
+    @Bean
+    public DataSourceTransactionManager getTransactionManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
     }
 }
