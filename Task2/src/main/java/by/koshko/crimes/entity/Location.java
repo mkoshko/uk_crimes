@@ -10,8 +10,7 @@ public class Location {
     public Location() {
     }
 
-    public Location(long id, Street street, double latitude, double longitude) {
-        this.id = id;
+    public Location(Street street, double latitude, double longitude) {
         this.street = street;
         this.latitude = latitude;
         this.longitude = longitude;
