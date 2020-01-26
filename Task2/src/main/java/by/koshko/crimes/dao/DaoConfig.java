@@ -4,9 +4,11 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.codejargon.fluentjdbc.api.FluentJdbc;
 import org.codejargon.fluentjdbc.api.FluentJdbcBuilder;
+import org.codejargon.fluentjdbc.api.integration.providers.DataSourceConnectionProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
@@ -16,7 +18,6 @@ import java.util.Properties;
 
 @Configuration
 @EnableTransactionManagement
-@ComponentScan(basePackages = "by.koshko.crimes")
 public class DaoConfig {
 
     private static final String PROPERTIES_FILE = "dataSource.properties";
@@ -34,7 +35,7 @@ public class DaoConfig {
     @Bean
     public FluentJdbc getFluentJdbc(DataSource dataSource) {
         return new FluentJdbcBuilder()
-                .connectionProvider(dataSource)
+                .connectionProvider(new TransactionAwareDataSourceProxy(dataSource))
                 .build();
     }
 
