@@ -1,12 +1,22 @@
 package by.koshko.crimes.entity;
 
 public class Point {
+    private String name;
     private double latitude;
     private double longitude;
 
-    public Point(double latitude, double longitude) {
+    public Point(String name, double latitude, double longitude) {
+        this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public double getLatitude() {
