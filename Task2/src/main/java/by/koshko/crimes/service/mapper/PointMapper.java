@@ -1,13 +1,17 @@
 package by.koshko.crimes.service.mapper;
 
 import by.koshko.crimes.entity.Point;
-import by.koshko.crimes.service.MappingException;
 import by.koshko.crimes.service.RequestDataMapper;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class PointMapper implements RequestDataMapper<Point> {
@@ -15,29 +19,46 @@ public class PointMapper implements RequestDataMapper<Point> {
     private static final int NAME_INDEX = 0;
     private static final int LONGITUDE_INDEX = 1;
     private static final int LATITUDE_INDEX = 2;
+    Logger logger = LoggerFactory.getLogger(PointMapper.class);
 
-    public Point map(String coordinates) throws MappingException {
-        if (coordinates == null) {
-            throw new MappingException("Empty string.");
-        }
-        List<String> params = Arrays.asList(coordinates.split(","));
-        checkParameters(params);
-        return createPoint(params);
+    @Override
+    public List<Point> map(Stream<String> parameters) {
+        return parameters
+                .map(this::map)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
-    private void checkParameters(List<String> params) throws MappingException {
+    private Point map(String coordinates) {
+        if (coordinates == null) {
+            return null;
+        }
+        List<String> params = Arrays.asList(coordinates.split(","));
+        if (isParamsValid(params)) {
+            return createPoint(params);
+        } else {
+            return null;
+        }
+    }
+
+    private boolean isParamsValid(List<String> params) {
+        boolean isValid = true;
         if (params.size() != 3) {
-            throw new MappingException("Invalid number of parameters, expected 3 but found "
+            logger.info("Invalid number of parameters, expected 3 but found "
                     + params.size() + ".");
+            return false;
         }
         if (isNotParsable(params.get(LONGITUDE_INDEX))) {
-            throw new MappingException("Invalid longitude value, expected double but found "
+            logger.info("Invalid longitude value, expected double but found "
                     + params.get(LONGITUDE_INDEX) + ".");
+            isValid = false;
         }
         if (isNotParsable(params.get(LATITUDE_INDEX))) {
-            throw new MappingException("Invalid latitude value, expected double but found "
+            logger.info("Invalid latitude value, expected double but found "
                     + params.get(LATITUDE_INDEX) + ".");
+            isValid = false;
         }
+        return isValid;
     }
 
     private boolean isNotParsable(String value) {
