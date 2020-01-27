@@ -1,5 +1,6 @@
 package by.koshko.crimes.service;
 
+import by.koshko.crimes.entity.Crime;
 import by.koshko.crimes.service.mapper.CrimeMapper;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -14,12 +15,12 @@ public class StreetCrimesJsonArrayHandler implements JsonArrayHandler {
 
     private JsonArrayStreamSupport jsonArrayStreamSupport;
     private CrimeMapper crimeMapper;
-    private StreetCrimesPersistenceService persistenceService;
+    private PersistenceService<Crime> persistenceService;
 
     @Autowired
     public StreetCrimesJsonArrayHandler(JsonArrayStreamSupport converter,
                                         CrimeMapper crimeMapper,
-                                        StreetCrimesPersistenceService persistenceService) {
+                                        PersistenceService<Crime> persistenceService) {
         this.jsonArrayStreamSupport = converter;
         this.crimeMapper = crimeMapper;
         this.persistenceService = persistenceService;
