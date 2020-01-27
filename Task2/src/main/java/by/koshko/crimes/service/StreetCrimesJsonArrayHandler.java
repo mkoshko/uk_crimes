@@ -29,8 +29,8 @@ public class StreetCrimesJsonArrayHandler implements JsonArrayHandler {
     @Override
     public void process(String jsonArrayString) throws ServiceException {
         JSONArray jsonArray = createJsonArray(jsonArrayString);
-        Stream<JSONObject> jsonObjectParallelStream = jsonArrayStreamSupport.toParallelStream(jsonArray);
-        jsonObjectParallelStream.map(crimeMapper::map).forEach(persistenceService::save);
+        Stream<JSONObject> jsonObjectStream = jsonArrayStreamSupport.toStream(jsonArray);
+        jsonObjectStream.map(crimeMapper::map).forEach(persistenceService::save);
     }
 
     private JSONArray createJsonArray(String json) throws ServiceException {
