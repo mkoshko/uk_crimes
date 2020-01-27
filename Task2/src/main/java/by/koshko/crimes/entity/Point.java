@@ -5,10 +5,10 @@ public class Point {
     private double latitude;
     private double longitude;
 
-    public Point(String name, double latitude, double longitude) {
+    public Point(String name, double longitude, double latitude) {
         this.name = name;
-        this.latitude = latitude;
         this.longitude = longitude;
+        this.latitude = latitude;
     }
 
     public String getName() {
