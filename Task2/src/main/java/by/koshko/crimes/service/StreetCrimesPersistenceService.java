@@ -35,7 +35,7 @@ public class StreetCrimesPersistenceService implements PersistenceService<Crime>
         if (crime != null) {
             saveStreet(crime);
             saveLocation(crime.getLocation());
-            saveOutcomeStatus(crime.getOutcome_status());
+            saveOutcomeStatus(crime.getOutcomeStatus());
             crimeDao.save(crime);
         }
     }

@@ -15,9 +15,9 @@ import java.util.List;
 public class CrimeDao implements Dao<Crime> {
 
     private static final String INSERT_QUERY
-            = "INSERT INTO crime (id, category, location_type, location_id," +
-            " context, outcome_status_id, persistent_id, location_subtype, month)" +
-            " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING;";
+            = "INSERT INTO crime (id, category, location_type, location_id,"
+            + " context, outcome_status_id, persistent_id, location_subtype, month)"
+            + " VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT DO NOTHING;";
     private FluentJdbc fluentJdbc;
 
     @Autowired
@@ -38,7 +38,7 @@ public class CrimeDao implements Dao<Crime> {
         List<Object> params = new ArrayList<>();
         params.add(crime.getId());
         params.add(crime.getCategory());
-        params.add(crime.getLocation_type());
+        params.add(crime.getLocationType());
         Location location = crime.getLocation();
         if (location != null) {
             params.add(location.getId());
@@ -46,14 +46,14 @@ public class CrimeDao implements Dao<Crime> {
             params.add(null);
         }
         params.add(crime.getContext());
-        OutcomeStatus outcomeStatus = crime.getOutcome_status();
+        OutcomeStatus outcomeStatus = crime.getOutcomeStatus();
         if (outcomeStatus == null) {
             params.add(null);
         } else {
             params.add(outcomeStatus.getId());
         }
-        params.add(crime.getPersistent_id());
-        params.add(crime.getLocation_subtype());
+        params.add(crime.getPersistentId());
+        params.add(crime.getLocationSubtype());
         params.add(crime.getMonth());
         return params;
     }

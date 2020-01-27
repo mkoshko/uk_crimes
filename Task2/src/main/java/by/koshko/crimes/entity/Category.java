@@ -3,7 +3,7 @@ package by.koshko.crimes.entity;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Category {
+public final class Category {
 
     private static Map<String, Integer> categories = new HashMap<>();
 
@@ -38,7 +38,10 @@ public class Category {
         categories.put("Status update unavailable", 28);
     }
 
-    public static int getCategoryId(String category_name) {
-        return categories.get(category_name);
+    private Category() {
+    }
+
+    public static int getCategoryId(String categoryName) {
+        return categories.get(categoryName);
     }
 }

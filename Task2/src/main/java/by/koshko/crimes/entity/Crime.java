@@ -5,11 +5,11 @@ public class Crime {
     private long id;
     private String category;
     private String context;
-    private String location_type;
-    private String persistent_id;
-    private String location_subtype;
+    private String locationType;
+    private String persistentId;
+    private String locationSubtype;
     private String month;
-    private OutcomeStatus outcome_status;
+    private OutcomeStatus outcomeStatus;
     private Location location;
 
     public Crime() {
@@ -19,11 +19,11 @@ public class Crime {
         this.id = builder.id;
         this.category = builder.category;
         this.context = builder.context;
-        this.location_type = builder.location_type;
-        this.persistent_id = builder.persistent_id;
-        this.location_subtype = builder.location_subtype;
+        this.locationType = builder.locationType;
+        this.persistentId = builder.persistentId;
+        this.locationSubtype = builder.locationSubtype;
         this.month = builder.month;
-        this.outcome_status = builder.outcome_status;
+        this.outcomeStatus = builder.outcomeStatus;
         this.location = builder.location;
     }
 
@@ -51,36 +51,36 @@ public class Crime {
         this.context = context;
     }
 
-    public String getLocation_type() {
-        return location_type;
+    public String getLocationType() {
+        return locationType;
     }
 
-    public void setLocation_type(String location_type) {
-        this.location_type = location_type;
+    public void setLocationType(String locationType) {
+        this.locationType = locationType;
     }
 
-    public OutcomeStatus getOutcome_status() {
-        return outcome_status;
+    public OutcomeStatus getOutcomeStatus() {
+        return outcomeStatus;
     }
 
-    public void setOutcome_status(OutcomeStatus outcome_status) {
-        this.outcome_status = outcome_status;
+    public void setOutcomeStatus(OutcomeStatus outcomeStatus) {
+        this.outcomeStatus = outcomeStatus;
     }
 
-    public String getPersistent_id() {
-        return persistent_id;
+    public String getPersistentId() {
+        return persistentId;
     }
 
-    public void setPersistent_id(String persistent_id) {
-        this.persistent_id = persistent_id;
+    public void setPersistentId(String persistentId) {
+        this.persistentId = persistentId;
     }
 
-    public String getLocation_subtype() {
-        return location_subtype;
+    public String getLocationSubtype() {
+        return locationSubtype;
     }
 
-    public void setLocation_subtype(String location_subtype) {
-        this.location_subtype = location_subtype;
+    public void setLocationSubtype(String locationSubtype) {
+        this.locationSubtype = locationSubtype;
     }
 
     public String getMonth() {
@@ -104,17 +104,17 @@ public class Crime {
         private long id;
         private String category;
         private String context;
-        private String location_type;
-        private String persistent_id;
-        private String location_subtype;
+        private String locationType;
+        private String persistentId;
+        private String locationSubtype;
         private String month;
-        private OutcomeStatus outcome_status;
+        private OutcomeStatus outcomeStatus;
         private Location location;
 
-        public Builder(long id, String category, String location_type, String month, Location location) {
+        public Builder(long id, String category, String locationType, String month, Location location) {
             this.id = id;
             this.category = category;
-            this.location_type = location_type;
+            this.locationType = locationType;
             this.month = month;
             this.location = location;
         }
@@ -124,18 +124,18 @@ public class Crime {
             return this;
         }
 
-        public Builder setPersistent_id(String persistent_id) {
-            this.persistent_id = persistent_id;
+        public Builder setPersistentId(String persistentId) {
+            this.persistentId = persistentId;
             return this;
         }
 
-        public Builder setLocation_subtype(String location_subtype) {
-            this.location_subtype = location_subtype;
+        public Builder setLocationSubtype(String locationSubtype) {
+            this.locationSubtype = locationSubtype;
             return this;
         }
 
-        public Builder setOutcome_status(OutcomeStatus outcome_status) {
-            this.outcome_status = outcome_status;
+        public Builder setOutcomeStatus(OutcomeStatus outcomeStatus) {
+            this.outcomeStatus = outcomeStatus;
             return this;
         }
 

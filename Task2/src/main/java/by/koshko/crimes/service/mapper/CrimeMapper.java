@@ -26,8 +26,8 @@ public class CrimeMapper implements JsonToObjectMapper<Crime> {
                 jsonCrime.getString("month"),
                 locationMapper.map(jsonCrime.optJSONObject("location")))
                 .setContext(jsonCrime.getString("context"))
-                .setPersistent_id(jsonCrime.getString("persistent_id"))
-                .setOutcome_status(outcomeStatusMapper.map(jsonCrime.optJSONObject("outcome_status")))
+                .setPersistentId(jsonCrime.getString("persistent_id"))
+                .setOutcomeStatus(outcomeStatusMapper.map(jsonCrime.optJSONObject("outcome_status")))
                 .build();
     }
 }
