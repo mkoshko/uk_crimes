@@ -21,9 +21,10 @@ constraint FK_location_street foreign key (street_id) references street (id)
 
 create table category_name
 (
-    id smallint,
+    id serial,
     category_name varchar(100),
-constraint PK_category_name_id PRIMARY KEY (id)
+constraint PK_category_name_id PRIMARY KEY (id),
+constraint UQ_category_name UNIQUE (category_name)
 );
 
 create table outcome_status
