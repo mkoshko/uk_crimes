@@ -8,11 +8,12 @@ import by.koshko.crimes.entity.Crime;
 import by.koshko.crimes.entity.Location;
 import by.koshko.crimes.entity.OutcomeStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-@org.springframework.stereotype.Service
+@Service
 public class StreetCrimesPersistenceService implements PersistenceService<Crime> {
 
     private CrimeDao crimeDao;
