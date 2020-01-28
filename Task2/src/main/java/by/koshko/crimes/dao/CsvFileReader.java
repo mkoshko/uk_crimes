@@ -5,15 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 
-public class CsvFileReader {
+public final class CsvFileReader {
 
-    private String filePath;
-
-    public CsvFileReader(String filePath) {
-        this.filePath = filePath;
+    private CsvFileReader() {
     }
 
-    public Stream<String> getLinesAsStream() throws IOException {
+    public static Stream<String> getLinesAsStream(String filePath) throws IOException {
         return Files.lines(Paths.get(filePath));
     }
 }
