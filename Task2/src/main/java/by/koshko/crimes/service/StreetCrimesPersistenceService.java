@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-public class StreetCrimesPersistenceService implements PersistenceService<Crime> {
+class StreetCrimesPersistenceService implements PersistenceService<Crime> {
 
     private CrimeDao crimeDao;
     private LocationDao locationDao;
