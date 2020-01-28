@@ -8,13 +8,12 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 @Service
-public class JsonArrayStreamSupport {
+public final class JsonArrayStreamSupport {
 
-    public Stream<JSONObject> toParallelStream(JSONArray jsonArray) {
-        return StreamSupport.stream(new IterableJsonArray(jsonArray).spliterator(), true);
+    private JsonArrayStreamSupport() {
     }
 
-    public Stream<JSONObject> toStream(JSONArray jsonArray) {
+    public static Stream<JSONObject> toStream(JSONArray jsonArray) {
         return StreamSupport.stream(new IterableJsonArray(jsonArray).spliterator(), false);
     }
 }
