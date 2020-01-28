@@ -40,5 +40,13 @@ public abstract class AbstractHttpRequestService implements HttpRequestService<P
         }
     }
 
-    abstract String buildRequestParameters(Point point, String... additionalParams);
+    String buildRequestParameters(Point point, String... additionalParams) {
+        StringBuilder builder = new StringBuilder("?");
+        builder.append("lat=").append(point.getLatitude());
+        builder.append("&").append("lng=").append(point.getLongitude());
+        if (additionalParams.length == 1) {
+            builder.append("&").append("date=").append(additionalParams[0]);
+        }
+        return builder.toString();
+    }
 }
