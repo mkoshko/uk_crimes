@@ -17,7 +17,6 @@ public class Application {
             );
         } catch (ExecutionException e) {
             System.err.println(e.getMessage());
-            cmd.printHelp();
         }
     }
 }
