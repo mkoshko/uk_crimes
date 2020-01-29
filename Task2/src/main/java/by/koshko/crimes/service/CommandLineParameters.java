@@ -12,6 +12,7 @@ public class CommandLineParameters {
     public static final String API_OPTION = "api";
     public static final String FROM_OPTION = "from";
     public static final String TO_OPTION = "to";
+    public static final String TARGET_OPTION = "target";
 
     private Options options = new Options();
     private Options helpOptions = new Options();
@@ -41,10 +42,12 @@ public class CommandLineParameters {
         api.setArgName(argName);
         Option file = new Option("Dfile", null, true, "path to a file.(REQUIRED)");
         file.setArgName(argName);
-        Option dateFrom = new Option("Dfrom", null, true, "date from search will start YYYY-mm.");
+        Option dateFrom = new Option("Dfrom", null, true, "start date YYYY-mm.");
         dateFrom.setArgName(argName);
-        Option dateTo = new Option("Dto", null, true, "search date to YYYY-mm.");
+        Option dateTo = new Option("Dto", null, true, "end date YYYY-mm.");
         dateTo.setArgName(argName);
+        Option target = new Option("Dtarget", null, true, "save location database or file.");
+        target.setArgName(argName);
         return Arrays.asList(help, api, file, dateFrom, dateTo);
     }
 
