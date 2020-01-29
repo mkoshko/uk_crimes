@@ -2,7 +2,7 @@ package by.koshko.crimes.exec;
 
 import by.koshko.crimes.service.ApplicationExecutor;
 import by.koshko.crimes.service.CommandLineParameters;
-import by.koshko.crimes.service.ExecutionException;
+import by.koshko.crimes.service.ApplicationException;
 
 public class Application {
 
@@ -15,7 +15,7 @@ public class Application {
                     cmd.getValue(CommandLineParameters.FROM_OPTION),
                     cmd.getValue(CommandLineParameters.TO_OPTION)
             );
-        } catch (ExecutionException e) {
+        } catch (ApplicationException e) {
             System.err.println(e.getMessage());
         }
     }

@@ -8,14 +8,20 @@ import java.io.IOException;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Stream;
 
 public class ExecutionService<T, R> {
 
     private Logger logger = LoggerFactory.getLogger(ExecutionService.class);
+    ExecutorService executorService = Executors.newCachedThreadPool();
     private RequestDataMapper<R> dataMapper;
     private HttpRequestService<R> requestService;
     private JsonArrayHandler<T> jsonArrayHandler;
+    private ConcurrentLinkedQueue<Future<String>> futures = new ConcurrentLinkedQueue<>();
 
     public ExecutionService(RequestDataMapper<R> dataMapper,
                             HttpRequestService<R> requestService,
@@ -26,7 +32,7 @@ public class ExecutionService<T, R> {
         jsonArrayHandler = new JsonArrayHandler<>(objectMapper, persistenceService);
     }
 
-    public void execute(String file, String startDate, String endDate) throws ExecutionException {
+    public void execute(String file, String startDate, String endDate) throws ApplicationException {
         DateRange dateRange = createDateRange(startDate, endDate);
         List<R> data = readDataFromFile(file);
         execute0(data, dateRange);
@@ -34,33 +40,25 @@ public class ExecutionService<T, R> {
 
     private void execute0(List<R> data, DateRange dateRange) {
 
-        data.parallelStream().forEach(point -> dateRange.stream().forEach(date -> {
-            try {
-                String jsonResponse = requestService.sendRequest(point, date);
-                jsonArrayHandler.process(jsonResponse);
-            } catch (ServiceException e) {
-                logger.error(e.getMessage());
-            }
-        }));
     }
 
-    private DateRange createDateRange(String startDate, String endDate) throws ExecutionException {
+    private DateRange createDateRange(String startDate, String endDate) throws ApplicationException {
         try {
             if (Objects.nonNull(startDate) || Objects.nonNull(endDate)) {
                 return new DateRange(startDate, endDate);
             }
         } catch (DateTimeParseException e) {
-            throw new ExecutionException("Invalid date format.");
+            throw new ApplicationException("Invalid date format.");
         }
-        throw new ExecutionException("Invalid date range.");
+        throw new ApplicationException("Invalid date range.");
     }
 
-    private List<R> readDataFromFile(String file) throws ExecutionException {
+    private List<R> readDataFromFile(String file) throws ApplicationException {
         try {
             Stream<String> data = CsvFileReader.getLinesAsStream(file);
             return dataMapper.map(data);
         } catch (IOException e) {
-            throw new ExecutionException("Cannot read data from file.", e);
+            throw new ApplicationException("Cannot read data from file.", e);
         }
     }
 }
