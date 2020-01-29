@@ -10,17 +10,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class ExecutorService<T, R> {
+public class ExecutionService<T, R> {
 
-    private Logger logger = LoggerFactory.getLogger(ExecutorService.class);
+    private Logger logger = LoggerFactory.getLogger(ExecutionService.class);
     private RequestDataMapper<R> dataMapper;
     private HttpRequestService<R> requestService;
     private JsonArrayHandler<T> jsonArrayHandler;
 
-    public ExecutorService(RequestDataMapper<R> dataMapper,
-                           HttpRequestService<R> requestService,
-                           JsonToObjectMapper<T> objectMapper,
-                           PersistenceService<T> persistenceService) {
+    public ExecutionService(RequestDataMapper<R> dataMapper,
+                            HttpRequestService<R> requestService,
+                            JsonToObjectMapper<T> objectMapper,
+                            PersistenceService<T> persistenceService) {
         this.dataMapper = dataMapper;
         this.requestService = requestService;
         jsonArrayHandler = new JsonArrayHandler<>(objectMapper, persistenceService);
@@ -33,6 +33,7 @@ public class ExecutorService<T, R> {
     }
 
     private void execute0(List<R> data, DateRange dateRange) {
+
         data.parallelStream().forEach(point -> dateRange.stream().forEach(date -> {
             try {
                 String jsonResponse = requestService.sendRequest(point, date);

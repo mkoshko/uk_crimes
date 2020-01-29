@@ -26,7 +26,7 @@ public class StreetCrimeExecutorServiceBuilder implements ExecutorServiceBuilder
         this.persistenceService = persistenceService;
     }
 
-    public ExecutorService<Crime, Point> build() {
-        return new ExecutorService<>(pointMapper, requestService, crimeMapper, persistenceService);
+    public ExecutionService<Crime, Point> build() {
+        return new ExecutionService<>(pointMapper, requestService, crimeMapper, persistenceService);
     }
 }
