@@ -29,7 +29,7 @@ public abstract class AbstractHttpRequestService implements HttpRequestService<P
             connection.setDoOutput(true);
             return getResponse(connection);
         } catch (IOException e) {
-            throw new ServiceException("Cannot send request.", e);
+            throw new ServiceException("Cannot send request." + e.getMessage(), e);
         }
     }
 
