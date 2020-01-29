@@ -16,10 +16,17 @@ public class CommandLineParameters {
 
     private Options options = new Options();
     private Options helpOptions = new Options();
+    private Properties properties;
 
-    public void build() {
+    public CommandLineParameters build(String... args) {
         options.addOption(createDefaultOption());
         createHelpOptions().forEach(helpOptions::addOption);
+        parse(args);
+        return this;
+    }
+
+    public String getValue(String key) {
+        return properties.getProperty(key);
     }
 
     private Option createDefaultOption() {
@@ -32,6 +39,25 @@ public class CommandLineParameters {
                 .numberOfArgs(2)
                 .desc("use value for given properties")
                 .build();
+    }
+
+    private void parse(String... args) {
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine cmd = parser.parse(options, args);
+            if (cmd.hasOption("h")) {
+                printHelp();
+                System.exit(0);
+            }
+            properties = cmd.getOptionProperties("D");
+        } catch (ParseException e) {
+            printHelp();
+        }
+    }
+
+    public void printHelp() {
+        HelpFormatter helpFormatter = new HelpFormatter();
+        helpFormatter.printHelp("crime [OPTION]...", helpOptions);
     }
 
     private List<Option> createHelpOptions() {
@@ -49,26 +75,5 @@ public class CommandLineParameters {
         Option target = new Option("Dtarget", null, true, "save location database or file.");
         target.setArgName(argName);
         return Arrays.asList(help, api, file, dateFrom, dateTo);
-    }
-
-    public Properties parse(String... args) {
-        CommandLineParser parser = new DefaultParser();
-        try {
-            CommandLine cmd = parser.parse(options, args);
-            if (cmd.hasOption("h")) {
-                printHelp();
-                System.exit(0);
-            }
-            return cmd.getOptionProperties("D");
-        } catch (ParseException e) {
-            printHelp();
-            System.exit(0);
-        }
-        return new Properties();
-    }
-
-    public void printHelp() {
-        HelpFormatter helpFormatter = new HelpFormatter();
-        helpFormatter.printHelp("crime [OPTION]...", helpOptions);
     }
 }

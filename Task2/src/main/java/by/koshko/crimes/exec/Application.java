@@ -2,38 +2,23 @@ package by.koshko.crimes.exec;
 
 import by.koshko.crimes.service.ApplicationExecutor;
 import by.koshko.crimes.service.CommandLineParameters;
-
-import java.util.Properties;
+import by.koshko.crimes.service.ExecutionException;
 
 public class Application {
 
     public static void main(String[] args) {
-        CommandLineParameters cmd = new CommandLineParameters();
-        cmd.build();
-        Properties properties = cmd.parse(args);
-        if (isRequiredParametersProvided(properties, cmd)) {
+        CommandLineParameters cmd = new CommandLineParameters().build(args);
+        try {
             new ApplicationExecutor().execute(
-                    properties.getProperty(CommandLineParameters.FILE_OPTION),
-                    properties.getProperty(CommandLineParameters.API_OPTION),
-                    properties.getProperty(CommandLineParameters.FROM_OPTION),
-                    properties.getProperty(CommandLineParameters.TO_OPTION)
+                    cmd.getValue(CommandLineParameters.FILE_OPTION),
+                    cmd.getValue(CommandLineParameters.API_OPTION),
+                    cmd.getValue(CommandLineParameters.FROM_OPTION),
+                    cmd.getValue(CommandLineParameters.TO_OPTION)
             );
+        } catch (ExecutionException e) {
+            System.err.println(e.getMessage());
+            cmd.printHelp();
         }
-
-    }
-
-    private static boolean isRequiredParametersProvided(Properties properties, CommandLineParameters cmd) {
-        boolean isValid = true;
-        String file = properties.getProperty(CommandLineParameters.FILE_OPTION);
-        String api = properties.getProperty(CommandLineParameters.API_OPTION);
-        if (file == null || file.isBlank()) {
-            isValid = false;
-            System.err.println("Path to file is not provided.");
-        } else if (api == null || api.isBlank()) {
-            isValid = false;
-            System.err.println("Api method is not provided");
-        }
-        return isValid;
     }
 }
 
