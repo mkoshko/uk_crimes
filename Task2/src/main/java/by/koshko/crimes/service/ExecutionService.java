@@ -8,16 +8,13 @@ import java.io.IOException;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Stream;
 
 public class ExecutionService<T, R> {
 
+    ExecutorService executorService = Executors.newFixedThreadPool(15);
     private Logger logger = LoggerFactory.getLogger(ExecutionService.class);
-    ExecutorService executorService = Executors.newCachedThreadPool();
     private RequestDataMapper<R> dataMapper;
     private HttpRequestService<R> requestService;
     private JsonArrayHandler<T> jsonArrayHandler;
@@ -39,7 +36,25 @@ public class ExecutionService<T, R> {
     }
 
     private void execute0(List<R> data, DateRange dateRange) {
-
+        long start = System.currentTimeMillis();
+        data.parallelStream().forEach(point -> dateRange.forEach(date -> {
+            Future<String> response = executorService.submit(() -> requestService.sendRequest(point, date));
+            try {
+                while (!response.isDone()) {
+                    TimeUnit.MILLISECONDS.sleep(500);
+                }
+                jsonArrayHandler.process(response.get());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }));
+        executorService.shutdown();
+        try {
+            executorService.awaitTermination(1, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println(System.currentTimeMillis() - start);
     }
 
     private DateRange createDateRange(String startDate, String endDate) throws ApplicationException {

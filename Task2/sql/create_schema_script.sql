@@ -30,7 +30,7 @@ constraint UQ_category_name UNIQUE (category_name)
 create table outcome_status
 (
     id bigserial,
-    category_name_id smallint,
+    category_name_id bigint,
     date varchar(7),
 constraint PK_outcome_status PRIMARY KEY (id),
 constraint UQ_outcome_status UNIQUE (category_name_id, date),
