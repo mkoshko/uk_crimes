@@ -36,25 +36,14 @@ public class ExecutionService<T, R> {
     }
 
     private void execute0(List<R> data, DateRange dateRange) {
-        long start = System.currentTimeMillis();
-        data.parallelStream().forEach(point -> dateRange.forEach(date -> {
-            Future<String> response = executorService.submit(() -> requestService.sendRequest(point, date));
+        data.parallelStream().forEach(point -> dateRange.stream().forEach(date -> {
             try {
-                while (!response.isDone()) {
-                    TimeUnit.MILLISECONDS.sleep(500);
-                }
-                jsonArrayHandler.process(response.get());
-            } catch (Exception e) {
-                e.printStackTrace();
+                String jsonResponse = requestService.sendRequest(point, date);
+                jsonArrayHandler.process(jsonResponse);
+            } catch (ServiceException e) {
+                logger.error(e.getMessage());
             }
         }));
-        executorService.shutdown();
-        try {
-            executorService.awaitTermination(1, TimeUnit.DAYS);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        System.out.println(System.currentTimeMillis() - start);
     }
 
     private DateRange createDateRange(String startDate, String endDate) throws ApplicationException {
