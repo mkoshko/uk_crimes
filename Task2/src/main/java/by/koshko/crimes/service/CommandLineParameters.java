@@ -64,12 +64,15 @@ public class CommandLineParameters {
     public void printHelp() {
         HelpFormatter helpFormatter = new HelpFormatter();
         helpFormatter.printHelp("crime [OPTION]...", helpOptions);
+        System.out.println("Available API methods: ");
+        System.out.println("1. street-level-crimes");
     }
 
     private List<Option> createHelpOptions() {
         String argName = "property=value";
         Option help = new Option("h", "help", false, "prints this help message.");
         help.setArgName(argName);
+        options.addOption(help);
         Option api = new Option("Dapi", null, true, "api method to use.(REQUIRED)");
         api.setArgName(argName);
         Option file = new Option("Dfile", null, true, "path to a file.(REQUIRED)");
