@@ -35,6 +35,10 @@ public class CommandLineParameters {
         return properties.getProperty(key);
     }
 
+    public Properties getProperties() {
+        return properties;
+    }
+
     private Option createDefaultOption() {
         return Option.builder()
                 .longOpt("D")
