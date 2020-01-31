@@ -14,7 +14,7 @@ help() {
   echo "Usage: deployment.sh [OPTION]..."
   echo "Options:"
   echo "  -f <project folder>,   path to the project."
-  echo "  -B <arg>,              build maven project from specified path."
+  echo "  -B,                    build maven project from specified path."
   echo "  -D,                    drop tables data."
   echo "  -v,                    display non-script output."
 }
@@ -79,7 +79,7 @@ run_application() {
 }
 
 parse_arguments() {
-  while getopts DB:vhf: opt "$@"; do
+  while getopts DBvhf: opt "$@"; do
   case $opt in
     v)
     quiet="-"
@@ -96,8 +96,6 @@ parse_arguments() {
     exit 0
     ;;
     B)
-    project_folder="$OPTARG"
-    echo "$project_folder"
     build_project "$project_folder"
     ;;
     *)
