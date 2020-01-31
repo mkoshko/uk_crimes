@@ -12,7 +12,6 @@ import java.net.URL;
 
 public abstract class AbstractHttpRequestService<T> implements HttpRequestService<T> {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
     private String requestUrl;
 
     public AbstractHttpRequestService(String requestUrl) {
@@ -23,7 +22,7 @@ public abstract class AbstractHttpRequestService<T> implements HttpRequestServic
     public String sendRequest(T coordinate, String... additionalParams) throws ServiceException {
         String request = requestUrl + buildRequestParameters(coordinate, additionalParams);
         try {
-            logger.info("Request submission for: {}.", coordinate);
+            System.out.println("Request submission for: " + coordinate);
             HttpURLConnection connection = (HttpURLConnection) new URL(request).openConnection();
             setupConnection(connection);
             return getResponse(connection);

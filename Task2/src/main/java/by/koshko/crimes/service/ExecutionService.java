@@ -12,18 +12,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
 public class ExecutionService<T, R> {
 
-    ExecutorService requestProcessor = Executors.newFixedThreadPool(15);
-    ExecutorService persistProcessor = Executors.newFixedThreadPool(15);
+    ExecutorService requestProcessor = Executors.newFixedThreadPool(10);
+    ExecutorService persistProcessor = Executors.newFixedThreadPool(10);
     private Logger logger = LoggerFactory.getLogger(ExecutionService.class);
     private RequestDataMapper<R> dataMapper;
     private HttpRequestService<R> requestService;
-    private BlockingQueue<Future<String>> tasks = new LinkedBlockingQueue<>(15);
-    private BlockingQueue<Future<String>> bufferedTasks = new LinkedBlockingQueue<>();
+    private BlockingQueue<Future<String>> tasks = new LinkedBlockingQueue<>(10);
     private JsonArrayHandler<T> jsonArrayHandler;
 
     public ExecutionService(RequestDataMapper<R> dataMapper,
@@ -42,19 +40,12 @@ public class ExecutionService<T, R> {
     }
 
     private void execute0(List<R> data, DateRange dateRange) {
-        requestProcessor.execute(() -> {
-            while (!(persistProcessor.isTerminated() && tasks.isEmpty())) {
+        persistProcessor.execute(() -> {
+            while (hasWork()) {
                 try {
-                    if (tasks.isEmpty()) {
-                        TimeUnit.MILLISECONDS.sleep(100);
-                    }
                     Future<String> task = tasks.take();
-                    while (!task.isDone()) {
-                        TimeUnit.MILLISECONDS.sleep(100);
-                    }
                     persistProcessor.execute(() -> {
                         try {
-                            logger.info("Processing response...");
                             jsonArrayHandler.process(task.get());
                         } catch (ServiceException e) {
                             logger.error("Cannot process the response. {}", e.getMessage());
@@ -66,6 +57,7 @@ public class ExecutionService<T, R> {
                     Thread.currentThread().interrupt();
                 }
             }
+            persistProcessor.shutdown();
         });
         dateRange.forEach(date -> data.forEach(point -> {
             Future<String> task = processRequest(point, date);
@@ -75,10 +67,11 @@ public class ExecutionService<T, R> {
                 Thread.currentThread().interrupt();
             }
         }));
+        requestProcessor.shutdown();
     }
 
-    private void throttle() {
-
+    private boolean hasWork() {
+        return !(requestProcessor.isShutdown() && tasks.isEmpty());
     }
 
     private Future<String> processRequest(R point, String date) {
