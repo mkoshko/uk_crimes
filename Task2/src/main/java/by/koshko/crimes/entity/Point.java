@@ -34,4 +34,9 @@ public class Point {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s, latitude: %f, longitude: %f", name, latitude, longitude);
+    }
 }
