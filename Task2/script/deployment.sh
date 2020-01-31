@@ -32,7 +32,7 @@ clear_database() {
 
 create_tables() {
   echo "Creating tables..."
-  psql -U "$dbuser" "$dbname" -q -f "schema.sql"
+  psql -U "$dbuser" "$dbname" -q -f "$project_folder/sql/create_schema_script.sql"
   if [[ "$?" -eq 0 ]]; then
     echo "Done."
   else
