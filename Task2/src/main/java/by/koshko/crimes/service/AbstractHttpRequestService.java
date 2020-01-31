@@ -28,7 +28,7 @@ public abstract class AbstractHttpRequestService<T> implements HttpRequestServic
             setupConnection(connection);
             return getResponse(connection);
         } catch (IOException e) {
-            throw new ServiceException();
+            throw new ServiceException("Request failed. " + e.getMessage());
         }
     }
 
