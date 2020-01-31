@@ -69,7 +69,7 @@ drop_table_data() {
 
 build_project() {
   echo "Building project..."
-  mvn "$quiet"f "$1" clean package
+  mvn "$quiet"f "$project_folder" clean package
   echo "Done"
 }
 
