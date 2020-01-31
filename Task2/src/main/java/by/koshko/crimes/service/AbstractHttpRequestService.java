@@ -1,6 +1,5 @@
 package by.koshko.crimes.service;
 
-import by.koshko.crimes.entity.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,11 +7,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
 
-public abstract class AbstractHttpRequestService implements HttpRequestService<Point> {
+public abstract class AbstractHttpRequestService<T> implements HttpRequestService<T> {
 
-    private Logger logger = LoggerFactory.getLogger(StreetCrimesHttpRequestService.class);
+    private Logger logger = LoggerFactory.getLogger(getClass());
     private String requestUrl;
 
     public AbstractHttpRequestService(String requestUrl) {
@@ -20,17 +20,21 @@ public abstract class AbstractHttpRequestService implements HttpRequestService<P
     }
 
     @Override
-    public String sendRequest(Point point, String... additionalParams) throws ServiceException {
-        logger.info("Requesting information for " + point.getName() + ".");
+    public String sendRequest(T coordinate, String... additionalParams) throws ServiceException {
+        String request = requestUrl + buildRequestParameters(coordinate, additionalParams);
         try {
-            URL url = new URL(this.requestUrl + buildRequestParameters(point, additionalParams));
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("GET");
-            connection.setDoOutput(true);
+            logger.info("Request submission for: {}.", coordinate);
+            HttpURLConnection connection = (HttpURLConnection) new URL(request).openConnection();
+            setupConnection(connection);
             return getResponse(connection);
         } catch (IOException e) {
-            throw new ServiceException("Cannot send request." + e.getMessage(), e);
+            throw new ServiceException();
         }
+    }
+
+    private void setupConnection(HttpURLConnection connection) throws ProtocolException {
+        connection.setRequestMethod("GET");
+        connection.setDoOutput(true);
     }
 
     private String getResponse(HttpURLConnection connection) throws IOException {
@@ -40,13 +44,5 @@ public abstract class AbstractHttpRequestService implements HttpRequestService<P
         }
     }
 
-    String buildRequestParameters(Point point, String... additionalParams) {
-        StringBuilder builder = new StringBuilder("?");
-        builder.append("lat=").append(point.getLatitude());
-        builder.append("&").append("lng=").append(point.getLongitude());
-        if (additionalParams.length == 1) {
-            builder.append("&").append("date=").append(additionalParams[0]);
-        }
-        return builder.toString();
-    }
+    abstract String buildRequestParameters(T coordinate, String... additionalParams);
 }

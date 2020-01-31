@@ -10,20 +10,20 @@ import org.springframework.stereotype.Component;
 @Component("street-level-crimes")
 public class StreetCrimeExecutorServiceBuilder implements ExecutorServiceBuilder {
 
+    private static final String REQUEST_URL = "https://data.police.uk/api/crimes-street/all-crime";
     private PointMapper pointMapper;
-    private StreetCrimesHttpRequestService requestService;
+    private PointHttpRequestService requestService;
     private CrimeMapper crimeMapper;
     private PersistenceService<Crime> persistenceService;
 
     @Autowired
     public StreetCrimeExecutorServiceBuilder(PointMapper pointMapper,
-                                             StreetCrimesHttpRequestService requestService,
                                              CrimeMapper crimeMapper,
                                              PersistenceService<Crime> persistenceService) {
         this.pointMapper = pointMapper;
-        this.requestService = requestService;
         this.crimeMapper = crimeMapper;
         this.persistenceService = persistenceService;
+        this.requestService = new PointHttpRequestService(REQUEST_URL);
     }
 
     public ExecutionService<Crime, Point> build() {
