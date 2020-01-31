@@ -16,8 +16,8 @@ import java.util.stream.Stream;
 
 public class ExecutionService<T, R> {
 
-    ExecutorService executorService = Executors.newCachedThreadPool();
-    ExecutorService requestExecutor = Executors.newCachedThreadPool();
+    ExecutorService executorService = Executors.newFixedThreadPool(30);
+    ExecutorService requestExecutor = Executors.newFixedThreadPool(30);
     private Logger logger = LoggerFactory.getLogger(ExecutionService.class);
     private RequestDataMapper<R> dataMapper;
     private HttpRequestService<R> requestService;
@@ -43,7 +43,6 @@ public class ExecutionService<T, R> {
     }
 
     private void execute0(List<R> data, DateRange dateRange) {
-
         data.forEach(point -> dateRange.stream().forEach(date -> {
             checkTimeAndReset();
             processRequest(point, date);
@@ -54,15 +53,14 @@ public class ExecutionService<T, R> {
         executorService.execute(() -> {
             try {
                 while (isApiCallLimitExceeded()) {
-                    logger.info("Number of requests is exceeded. Waiting...");
                     TimeUnit.MILLISECONDS.sleep(50);
                 }
-                logger.info("Number of request: {}.", numberOfRequests.incrementAndGet());
+                numberOfRequests.incrementAndGet();
                 Future<String> response = requestExecutor.submit(() -> requestService.sendRequest(point, date));
                 while (!response.isDone()) {
                     TimeUnit.MILLISECONDS.sleep(100);
                 }
-                logger.info("Request is complete. Number of request: {}.", numberOfRequests.decrementAndGet());
+                numberOfRequests.decrementAndGet();
                 jsonArrayHandler.process(response.get());
             } catch (ServiceException e) {
                 failedRequests.add(new FailedRequest<>(point, date));
@@ -77,7 +75,6 @@ public class ExecutionService<T, R> {
 
     private void checkTimeAndReset() {
         if (System.currentTimeMillis() - startTime > TimeUnit.SECONDS.toMillis(1)) {
-            logger.info("Reset number of requests.");
             numberOfRequests.set(0);
             startTime = System.currentTimeMillis();
         }
