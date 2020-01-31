@@ -12,6 +12,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 public class ExecutionService<T, R> {
@@ -23,6 +25,8 @@ public class ExecutionService<T, R> {
     private HttpRequestService<R> requestService;
     private BlockingQueue<Future<String>> tasks = new LinkedBlockingQueue<>(10);
     private JsonArrayHandler<T> jsonArrayHandler;
+    private int totalRequests = 0;
+    private AtomicInteger processedResponses = new AtomicInteger();
 
     public ExecutionService(RequestDataMapper<R> dataMapper,
                             HttpRequestService<R> requestService,
@@ -47,6 +51,7 @@ public class ExecutionService<T, R> {
                     persistProcessor.execute(() -> {
                         try {
                             jsonArrayHandler.process(task.get());
+                            incrementProcessedResponses();
                         } catch (ServiceException e) {
                             logger.error("Cannot process the response. {}", e.getMessage());
                         } catch (InterruptedException | ExecutionException e1) {
@@ -61,6 +66,7 @@ public class ExecutionService<T, R> {
         });
         dateRange.forEach(date -> data.forEach(point -> {
             Future<String> task = processRequest(point, date);
+            incrementTotalRequests();
             try {
                 tasks.put(task);
             } catch (InterruptedException e) {
@@ -68,6 +74,27 @@ public class ExecutionService<T, R> {
             }
         }));
         requestProcessor.shutdown();
+        while (!persistProcessor.isTerminated()) {
+            try {
+                TimeUnit.MILLISECONDS.sleep(100);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        report();
+    }
+
+    private void report() {
+        System.out.println(String.format("Total requests: [%d]. Total success responses [%d]. Failed [%d]",
+                totalRequests, processedResponses.get(), totalRequests - processedResponses.get()));
+    }
+
+    private void incrementTotalRequests() {
+        totalRequests++;
+    }
+
+    private void incrementProcessedResponses() {
+        processedResponses.incrementAndGet();
     }
 
     private boolean hasWork() {
