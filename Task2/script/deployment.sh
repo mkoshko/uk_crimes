@@ -69,12 +69,13 @@ drop_table_data() {
 
 build_project() {
   echo "Building project..."
-  mvn "$quiet"f "$project_folder" clean package
+  echo "$1"
+  mvn -f "$1" clean package
   echo "Done"
 }
 
 run_application() {
-  java "-Djava.util.concurrent.ForkJoinPool.common.parallelism=8" -jar "$project_folder/target/crime.jar -Dapi=street-level-crimes -Dfile=$project_folder/data/LondonStations.csv -Dfrom=2018-01 -Dto=2018-05"
+  java -jar "$project_folder/target/crime.jar" -Dapi=street-level-crimes -Dfile="$project_folder/data/LondonStations.csv" -Dfrom=2018-01 -Dto=2018-05
 }
 
 parse_arguments() {
@@ -96,6 +97,7 @@ parse_arguments() {
     ;;
     B)
     project_folder="$OPTARG"
+    echo "$project_folder"
     build_project "$project_folder"
     ;;
     *)
