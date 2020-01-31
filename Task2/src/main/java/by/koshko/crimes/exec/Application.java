@@ -9,12 +9,7 @@ public class Application {
     public static void main(String[] args) {
         CommandLineParameters cmd = new CommandLineParameters().build(args);
         try {
-            new ApplicationExecutor().execute(
-                    cmd.getValue(CommandLineParameters.FILE_OPTION),
-                    cmd.getValue(CommandLineParameters.API_OPTION),
-                    cmd.getValue(CommandLineParameters.FROM_OPTION),
-                    cmd.getValue(CommandLineParameters.TO_OPTION)
-            );
+            new ApplicationExecutor().execute(cmd.getProperties());
         } catch (ApplicationException e) {
             System.err.println(e.getMessage());
         }
