@@ -25,8 +25,8 @@ public class ExecutionService<T, R> {
     private static final int TASKS_LIMIT = 15;
     private Logger logger = LoggerFactory.getLogger(ExecutionService.class);
 
-    private ExecutorService requestProcessor = Executors.newFixedThreadPool(15);
-    private ExecutorService persistProcessor = Executors.newFixedThreadPool(10);
+    private ExecutorService requestProcessor = Executors.newFixedThreadPool(5);
+    private ExecutorService persistProcessor = Executors.newFixedThreadPool(20);
     private BlockingQueue<Future<String>> tasks = new LinkedBlockingQueue<>(16);
     private AtomicInteger processedResponses = new AtomicInteger();
     private RequestDataMapper<R> dataMapper;
@@ -56,18 +56,18 @@ public class ExecutionService<T, R> {
         });
         dateRange.forEach(date -> coordinates.forEach(point -> {
             Future<String> task = sendRequest(point, date);
-            incrementTotalRequests();
+            ++totalRequests;
             putTaskInQueue(task);
         }));
         requestProcessor.shutdown();
-        while (!persistProcessor.isTerminated()) {
-            try {
-                TimeUnit.MILLISECONDS.sleep(100);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
+        waitForTermination();
         report();
+    }
+
+    private void waitForTermination() {
+        while (!persistProcessor.isTerminated()) {
+            sleepMillis(500);
+        }
     }
 
     private String returnValueIfComplete(Future<String> task) {
@@ -88,7 +88,7 @@ public class ExecutionService<T, R> {
     private void processResponse(String jsonResponse) {
         try {
             jsonArrayHandler.process(jsonResponse);
-            incrementProcessedResponses();
+            processedResponses.incrementAndGet();
         } catch (ServiceException e) {
             logger.error("Cannot process the response. {}", e.getMessage());
         }
@@ -111,7 +111,7 @@ public class ExecutionService<T, R> {
     private void putTaskInQueue(Future<String> task) {
         try {
             while (tasks.size() >= TASKS_LIMIT) {
-                TimeUnit.MILLISECONDS.sleep(1);
+                sleepMillis(1);
             }
             tasks.put(task);
         } catch (InterruptedException e) {
@@ -119,17 +119,17 @@ public class ExecutionService<T, R> {
         }
     }
 
+    private void sleepMillis(long milliseconds) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(milliseconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
     private void report() {
-        System.out.println(String.format("Total requests: [%d]. Total success responses [%d]. Failed [%d]",
+        System.out.println(String.format("Total requests: [%d]. Total success responses [%d]. Failed [%d].",
                 totalRequests, processedResponses.get(), totalRequests - processedResponses.get()));
-    }
-
-    private void incrementTotalRequests() {
-        totalRequests++;
-    }
-
-    private void incrementProcessedResponses() {
-        processedResponses.incrementAndGet();
     }
 
     private Future<String> sendRequest(R point, String date) {
