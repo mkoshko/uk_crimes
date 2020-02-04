@@ -1,4 +1,4 @@
-package by.koshko.crimes.service;
+package by.koshko.crimes.util;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;

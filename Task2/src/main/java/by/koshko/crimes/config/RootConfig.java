@@ -1,4 +1,4 @@
-package by.koshko.crimes.service;
+package by.koshko.crimes.config;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;

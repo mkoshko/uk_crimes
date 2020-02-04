@@ -1,4 +1,6 @@
-package by.koshko.crimes.service;
+package by.koshko.crimes.util;
+
+import by.koshko.crimes.service.exception.ApplicationException;
 
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
@@ -34,18 +36,17 @@ public class DateRange implements Iterable<String> {
     }
 
     public static DateRange build(String startDate, String endDate) throws ApplicationException {
-        boolean bothDatesNotNull = nonNull(startDate) && nonNull(endDate);
-        if (bothDatesNotNull) {
-            YearMonth startDate0 = parse(startDate);
-            YearMonth endDate0 = parse(endDate);
-            checkRange(startDate0, endDate0);
-            return new DateRange(startDate0, endDate0);
+        if (nonNull(startDate) && nonNull(endDate)) {
+            YearMonth yearMonthStart = parse(startDate);
+            YearMonth yearMonthEnd = parse(endDate);
+            checkRange(yearMonthStart, yearMonthEnd);
+            return new DateRange(yearMonthStart, yearMonthEnd);
         }
         if (nonNull(startDate)) {
             YearMonth date = parse(startDate);
             return new DateRange(date, date);
         }
-        if ((nonNull(endDate))) {
+        if (nonNull(endDate)) {
             YearMonth date = YearMonth.parse(endDate);
             return new DateRange(date, date);
         }

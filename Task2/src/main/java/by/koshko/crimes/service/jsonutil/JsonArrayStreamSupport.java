@@ -1,4 +1,4 @@
-package by.koshko.crimes.service;
+package by.koshko.crimes.service.jsonutil;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package by.koshko.crimes.dao;
+package by.koshko.crimes.util;
 
 import java.io.IOException;
 import java.io.InputStream;

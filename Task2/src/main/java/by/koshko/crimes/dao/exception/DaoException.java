@@ -1,4 +1,4 @@
-package by.koshko.crimes.dao;
+package by.koshko.crimes.dao.exception;
 
 public class DaoException extends Exception {
 

@@ -1,6 +1,7 @@
-package by.koshko.crimes.service;
+package by.koshko.crimes.service.impl;
 
 import by.koshko.crimes.entity.Point;
+import by.koshko.crimes.service.HttpRequestService;
 
 public class PointHttpRequestService extends AbstractHttpRequestService<Point> implements HttpRequestService<Point> {
 

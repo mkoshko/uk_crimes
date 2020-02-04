@@ -1,6 +1,10 @@
 package by.koshko.crimes.service;
 
-import by.koshko.crimes.dao.CsvFileReader;
+import by.koshko.crimes.service.exception.ApplicationException;
+import by.koshko.crimes.service.exception.ServiceException;
+import by.koshko.crimes.service.jsonutil.JsonArrayHandler;
+import by.koshko.crimes.util.CsvFileReader;
+import by.koshko.crimes.util.DateRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,15 +22,17 @@ import java.util.stream.Stream;
 
 public class ExecutionService<T, R> {
 
-    ExecutorService requestProcessor = Executors.newFixedThreadPool(10);
-    ExecutorService persistProcessor = Executors.newFixedThreadPool(10);
+    private static final int TASKS_LIMIT = 15;
     private Logger logger = LoggerFactory.getLogger(ExecutionService.class);
+
+    private ExecutorService requestProcessor = Executors.newFixedThreadPool(15);
+    private ExecutorService persistProcessor = Executors.newFixedThreadPool(10);
+    private BlockingQueue<Future<String>> tasks = new LinkedBlockingQueue<>(16);
+    private AtomicInteger processedResponses = new AtomicInteger();
     private RequestDataMapper<R> dataMapper;
     private HttpRequestService<R> requestService;
-    private BlockingQueue<Future<String>> tasks = new LinkedBlockingQueue<>(10);
     private JsonArrayHandler<T> jsonArrayHandler;
     private int totalRequests = 0;
-    private AtomicInteger processedResponses = new AtomicInteger();
 
     public ExecutionService(RequestDataMapper<R> dataMapper,
                             HttpRequestService<R> requestService,
@@ -40,38 +46,18 @@ public class ExecutionService<T, R> {
     public void execute(String file, String startDate, String endDate) throws ApplicationException {
         DateRange dateRange = DateRange.build(startDate, endDate);
         List<R> data = readAndMapDataFromFile(file);
-        execute0(data, dateRange);
+        processDataInDateRange(data, dateRange);
     }
 
-    private void execute0(List<R> data, DateRange dateRange) {
+    private void processDataInDateRange(List<R> coordinates, DateRange dateRange) {
         persistProcessor.execute(() -> {
-            while (hasWork()) {
-                try {
-                    Future<String> task = tasks.take();
-                    persistProcessor.execute(() -> {
-                        try {
-                            jsonArrayHandler.process(task.get());
-                            incrementProcessedResponses();
-                        } catch (ServiceException e) {
-                            logger.error("Cannot process the response. {}", e.getMessage());
-                        } catch (InterruptedException | ExecutionException e1) {
-                            logger.error(e1.getMessage());
-                        }
-                    });
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
+            processTasksQueue();
             persistProcessor.shutdown();
         });
-        dateRange.forEach(date -> data.forEach(point -> {
-            Future<String> task = processRequest(point, date);
+        dateRange.forEach(date -> coordinates.forEach(point -> {
+            Future<String> task = sendRequest(point, date);
             incrementTotalRequests();
-            try {
-                tasks.put(task);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
+            putTaskInQueue(task);
         }));
         requestProcessor.shutdown();
         while (!persistProcessor.isTerminated()) {
@@ -82,6 +68,55 @@ public class ExecutionService<T, R> {
             }
         }
         report();
+    }
+
+    private String returnValueIfComplete(Future<String> task) {
+        try {
+            if (task.isDone()) {
+                return task.get();
+            } else {
+                tasks.put(task);
+            }
+        } catch (ExecutionException e) {
+            logger.error(e.getMessage());
+        } catch (InterruptedException e1) {
+            Thread.currentThread().interrupt();
+        }
+        return null;
+    }
+
+    private void processResponse(String jsonResponse) {
+        try {
+            jsonArrayHandler.process(jsonResponse);
+            incrementProcessedResponses();
+        } catch (ServiceException e) {
+            logger.error("Cannot process the response. {}", e.getMessage());
+        }
+    }
+
+    private void processTasksQueue() {
+        while (!(requestProcessor.isShutdown() && tasks.isEmpty())) {
+            try {
+                Future<String> task = tasks.take();
+                String response = returnValueIfComplete(task);
+                if (response != null) {
+                    persistProcessor.execute(() -> processResponse(response));
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+    }
+
+    private void putTaskInQueue(Future<String> task) {
+        try {
+            while (tasks.size() >= TASKS_LIMIT) {
+                TimeUnit.MILLISECONDS.sleep(10);
+            }
+            tasks.put(task);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private void report() {
@@ -97,11 +132,7 @@ public class ExecutionService<T, R> {
         processedResponses.incrementAndGet();
     }
 
-    private boolean hasWork() {
-        return !(requestProcessor.isShutdown() && tasks.isEmpty());
-    }
-
-    private Future<String> processRequest(R point, String date) {
+    private Future<String> sendRequest(R point, String date) {
         return requestProcessor.submit(() -> requestService.sendRequest(point, date));
     }
 

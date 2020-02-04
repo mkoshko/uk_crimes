@@ -1,7 +1,7 @@
-package by.koshko.crimes.service;
+package by.koshko.crimes.service.impl;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import by.koshko.crimes.service.HttpRequestService;
+import by.koshko.crimes.service.exception.ServiceException;
 
 import java.io.BufferedReader;
 import java.io.IOException;

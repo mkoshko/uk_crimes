@@ -1,4 +1,4 @@
-package by.koshko.crimes.service;
+package by.koshko.crimes.service.exception;
 
 public class ServiceException extends Exception {
 

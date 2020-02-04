@@ -1,4 +1,4 @@
-package by.koshko.crimes.service;
+package by.koshko.crimes.service.impl;
 
 import by.koshko.crimes.dao.impl.CrimeDao;
 import by.koshko.crimes.dao.impl.LocationDao;
@@ -7,6 +7,9 @@ import by.koshko.crimes.dao.impl.StreetDao;
 import by.koshko.crimes.entity.Crime;
 import by.koshko.crimes.entity.Location;
 import by.koshko.crimes.entity.OutcomeStatus;
+import by.koshko.crimes.service.PersistenceService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +19,7 @@ import java.util.Optional;
 @Service
 class StreetCrimesPersistenceService implements PersistenceService<Crime> {
 
+    private Logger logger = LoggerFactory.getLogger(getClass());
     private CrimeDao crimeDao;
     private LocationDao locationDao;
     private StreetDao streetDao;
