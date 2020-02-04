@@ -111,7 +111,7 @@ public class ExecutionService<T, R> {
     private void putTaskInQueue(Future<String> task) {
         try {
             while (tasks.size() >= TASKS_LIMIT) {
-                TimeUnit.MILLISECONDS.sleep(10);
+                TimeUnit.MILLISECONDS.sleep(1);
             }
             tasks.put(task);
         } catch (InterruptedException e) {
