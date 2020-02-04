@@ -25,7 +25,6 @@ public class JsonArrayHandler<T> {
 
     public void process(String jsonArray) throws ServiceException {
         long startTime = System.currentTimeMillis();
-        logger.info("Thread[{}] processing json array.", Thread.currentThread().getName());
         JSONArray array = createJsonArray(jsonArray);
         Stream<JSONObject> jsonObjectStream = JsonArrayStreamSupport.toStream(array);
         jsonObjectStream.map(mapper::map).forEach(persistenceService::save);
