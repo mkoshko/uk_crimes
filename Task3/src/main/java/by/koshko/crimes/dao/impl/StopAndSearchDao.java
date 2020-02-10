@@ -16,7 +16,12 @@ import java.util.Optional;
 public class StopAndSearchDao implements Dao<StopAndSearch> {
 
     private static final String INSERT_QUERY
-            = "INSERT INTO stop_and_search VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+            = "INSERT INTO stop_and_search "
+            + "(type, involved_person, datetime, operation, operation_name, location_id, gender,"
+            + " age_range, self_defined_ethnicity, officer_defined_ethnicity, legislation,"
+            + " object_of_search, outcome, outcome_object_id, outcome_linked_to_object_of_search,"
+            + " removal_of_more_than_outer_clothing)"
+            + " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
     private FluentJdbc fluentJdbc;
 
     @Autowired
@@ -35,21 +40,22 @@ public class StopAndSearchDao implements Dao<StopAndSearch> {
 
     private List<?> paramsToList(StopAndSearch entity) {
         List<Object> params = new ArrayList<>();
-        params.add(Optional.ofNullable(entity.getType()).orElse(null));
+        params.add(entity.getType());
         params.add(entity.isInvolved_person());
-        params.add(Optional.ofNullable(entity.getTimestamp()).orElse(null));
-        params.add(Optional.ofNullable(entity.getOperation_name()).orElse(null));
-        params.add(Optional.ofNullable(entity.getLocation()).map(Location::getId).orElse(null));
-        params.add(Optional.ofNullable(entity.getGender()).orElse(null));
-        params.add(Optional.ofNullable(entity.getAge_range()).orElse(null));
-        params.add(Optional.ofNullable(entity.getSelf_defined_ethnicity()).orElse(null));
-        params.add(Optional.ofNullable(entity.getOfficer_defined_ethnicity()).orElse(null));
-        params.add(Optional.ofNullable(entity.getLegislation()).orElse(null));
-        params.add(Optional.ofNullable(entity.getObject_of_search()).orElse(null));
-        params.add(Optional.ofNullable(entity.getOutcome()).orElse(null));
+        params.add(entity.getTimestamp());
+        params.add(entity.getOperation());
+        params.add(entity.getOperation_name());
+        params.add(entity.getLocation());
+        params.add(entity.getGender());
+        params.add(entity.getAge_range());
+        params.add(entity.getSelf_defined_ethnicity());
+        params.add(entity.getOfficer_defined_ethnicity());
+        params.add(entity.getLegislation());
+        params.add(entity.getObject_of_search());
+        params.add(entity.getOutcome());
         params.add(Optional.ofNullable(entity.getOutcome_object()).map(OutcomeObject::getId).orElse(null));
-        params.add(Optional.ofNullable(entity.getOutcome_linked_to_object_of_search()).orElse(null));
-        params.add(Optional.ofNullable(entity.getRemoval_of_more_than_outer_clothing()).orElse(null));
+        params.add(entity.getOutcome_linked_to_object_of_search());
+        params.add(entity.getRemoval_of_more_than_outer_clothing());
         return params;
     }
 }

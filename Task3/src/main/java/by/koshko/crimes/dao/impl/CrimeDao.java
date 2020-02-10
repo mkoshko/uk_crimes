@@ -4,12 +4,14 @@ import by.koshko.crimes.dao.Dao;
 import by.koshko.crimes.entity.Crime;
 import by.koshko.crimes.entity.Location;
 import by.koshko.crimes.entity.OutcomeStatus;
+import by.koshko.crimes.entity.Street;
 import org.codejargon.fluentjdbc.api.FluentJdbc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class CrimeDao implements Dao<Crime> {
@@ -39,19 +41,13 @@ public class CrimeDao implements Dao<Crime> {
         params.add(crime.getId());
         params.add(crime.getCategory());
         params.add(crime.getLocationType());
-        Location location = crime.getLocation();
-        if (location != null) {
-            params.add(location.getId());
-        } else {
-            params.add(null);
-        }
+        params.add(Optional.ofNullable(crime.getLocation())
+                .map(Location::getStreet)
+                .map(Street::getId)
+                .orElse(null));
         params.add(crime.getContext());
-        OutcomeStatus outcomeStatus = crime.getOutcomeStatus();
-        if (outcomeStatus == null) {
-            params.add(null);
-        } else {
-            params.add(outcomeStatus.getId());
-        }
+        params.add(Optional.ofNullable(crime.getOutcomeStatus())
+                .map(OutcomeStatus::getId).orElse(null));
         params.add(crime.getPersistentId());
         params.add(crime.getLocationSubtype());
         params.add(crime.getMonth());
