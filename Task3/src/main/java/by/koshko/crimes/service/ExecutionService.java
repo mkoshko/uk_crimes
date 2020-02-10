@@ -25,8 +25,8 @@ public class ExecutionService<T, R> {
     private static final int TASKS_LIMIT = 15;
     private Logger logger = LoggerFactory.getLogger(ExecutionService.class);
 
-    private ExecutorService requestProcessor = Executors.newFixedThreadPool(5);
-    private ExecutorService persistProcessor = Executors.newFixedThreadPool(20);
+    private ExecutorService requestProcessor = Executors.newFixedThreadPool(10);
+    private ExecutorService persistProcessor = Executors.newFixedThreadPool(12);
     private BlockingQueue<Future<String>> tasks = new LinkedBlockingQueue<>(16);
     private AtomicInteger processedResponses = new AtomicInteger();
     private RequestDataMapper<R> dataMapper;
