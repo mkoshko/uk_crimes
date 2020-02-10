@@ -29,7 +29,7 @@ public class Application {
         } catch (ApplicationException e) {
             logger.error(e.getMessage());
         }
-        System.out.println("Elapsed time: " + (System.currentTimeMillis() - start));
+        System.out.println("Elapsed time: " + (System.currentTimeMillis() - start) + " ms.");
     }
 }
 
