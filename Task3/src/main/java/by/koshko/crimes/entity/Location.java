@@ -2,7 +2,6 @@ package by.koshko.crimes.entity;
 
 public class Location {
 
-    private long id;
     private Street street;
     private double latitude;
     private double longitude;
@@ -14,14 +13,6 @@ public class Location {
         this.street = street;
         this.latitude = latitude;
         this.longitude = longitude;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public Street getStreet() {

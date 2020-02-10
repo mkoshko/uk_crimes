@@ -3,15 +3,21 @@ package by.koshko.crimes.entity;
 public class OutcomeStatus {
 
     private long id;
+    private long categoryNameId;
     private String category;
     private String date;
-
-    public OutcomeStatus() {
-    }
 
     public OutcomeStatus(String category, String date) {
         this.category = category;
         this.date = date;
+    }
+
+    public long getCategoryNameId() {
+        return categoryNameId;
+    }
+
+    public void setCategoryNameId(long categoryNameId) {
+        this.categoryNameId = categoryNameId;
     }
 
     public long getId() {

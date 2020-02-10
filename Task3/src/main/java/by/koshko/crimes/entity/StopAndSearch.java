@@ -8,6 +8,7 @@ public class StopAndSearch {
     private String type;
     private boolean involved_person;
     private LocalDateTime timestamp;
+    private String operation;
     private String operation_name;
     private Location location;
     private String gender;
@@ -35,6 +36,10 @@ public class StopAndSearch {
 
     public LocalDateTime getTimestamp() {
         return timestamp;
+    }
+
+    public String getOperation() {
+        return operation;
     }
 
     public String getOperation_name() {
@@ -90,6 +95,7 @@ public class StopAndSearch {
         type = builder.type;
         involved_person = builder.involved_person;
         timestamp = builder.timestamp;
+        operation = builder.operation;
         operation_name = builder.operation_name;
         location = builder.location;
         gender = builder.gender;
@@ -110,6 +116,7 @@ public class StopAndSearch {
         private String type;
         private boolean involved_person;
         private LocalDateTime timestamp;
+        private String operation;
         private String operation_name;
         private Location location;
         private String gender;
@@ -140,6 +147,11 @@ public class StopAndSearch {
 
         public StopAndSearchBuilder setTimestamp(LocalDateTime timestamp) {
             this.timestamp = timestamp;
+            return this;
+        }
+
+        public StopAndSearchBuilder setOperation(String operation) {
+            this.operation = operation;
             return this;
         }
 
