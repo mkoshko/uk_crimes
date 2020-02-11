@@ -8,7 +8,7 @@ public class StopAndSearch {
     private String type;
     private boolean involved_person;
     private LocalDateTime timestamp;
-    private String operation;
+    private boolean operation;
     private String operation_name;
     private Location location;
     private String gender;
@@ -38,7 +38,7 @@ public class StopAndSearch {
         return timestamp;
     }
 
-    public String getOperation() {
+    public boolean isOperation() {
         return operation;
     }
 
@@ -116,7 +116,7 @@ public class StopAndSearch {
         private String type;
         private boolean involved_person;
         private LocalDateTime timestamp;
-        private String operation;
+        private boolean operation;
         private String operation_name;
         private Location location;
         private String gender;
@@ -150,7 +150,7 @@ public class StopAndSearch {
             return this;
         }
 
-        public StopAndSearchBuilder setOperation(String operation) {
+        public StopAndSearchBuilder setOperation(boolean operation) {
             this.operation = operation;
             return this;
         }
