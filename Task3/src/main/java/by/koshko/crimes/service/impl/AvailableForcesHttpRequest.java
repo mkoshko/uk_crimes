@@ -1,8 +1,8 @@
 package by.koshko.crimes.service.impl;
 
-public class ForcesHttpRequestService extends AbstractHttpRequestService<Object> {
+public class AvailableForcesHttpRequest extends AbstractHttpRequestService<Object> {
 
-    public ForcesHttpRequestService(String requestUrl) {
+    public AvailableForcesHttpRequest(String requestUrl) {
         super(requestUrl);
     }
 
