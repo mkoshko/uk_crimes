@@ -1,8 +1,8 @@
 create table outcome_object
 (
     id serial,
-    identity varchar(50),
-    name varchar(50),
+    identity varchar(100),
+    name varchar(100),
     constraint PK_outcome_object primary key (id),
     constraint UQ_outcome_object_identity unique (identity)
 );
