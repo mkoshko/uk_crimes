@@ -42,9 +42,9 @@ public class StopAndSearchDao implements Dao<StopAndSearch> {
         params.add(entity.getType());
         params.add(entity.isInvolved_person());
         params.add(entity.getTimestamp());
-        params.add(entity.getOperation());
+        params.add(entity.isOperation());
         params.add(entity.getOperation_name());
-        params.add(entity.getLocation());
+        params.add(entity.getLocation().getStreet().getId());
         params.add(entity.getGender());
         params.add(entity.getAge_range());
         params.add(entity.getSelf_defined_ethnicity());
@@ -52,7 +52,7 @@ public class StopAndSearchDao implements Dao<StopAndSearch> {
         params.add(entity.getLegislation());
         params.add(entity.getObject_of_search());
         params.add(entity.getOutcome());
-        params.add(Optional.ofNullable(entity.getOutcome_object()).map(OutcomeObject::getId).orElse(null));
+        params.add(entity.getOutcome_object() != null ? entity.getOutcome_object().getId() : null);
         params.add(entity.getOutcome_linked_to_object_of_search());
         params.add(entity.getRemoval_of_more_than_outer_clothing());
         return params;

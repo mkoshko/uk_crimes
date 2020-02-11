@@ -36,7 +36,7 @@ public class OutcomeObjectDaoImpl implements OutcomeObjectDao {
 
     private List<?> paramsToList(OutcomeObject entity) {
         List<Object> params = new ArrayList<>();
-        params.add(entity.getId());
+        params.add(entity.getIdentity());
         params.add(entity.getName());
         return params;
     }
