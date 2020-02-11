@@ -26,6 +26,6 @@ create table stop_and_search
     outcome_object_id integer,
     outcome_linked_to_object_of_search boolean,
     removal_of_more_than_outer_clothing boolean,
-    constraint FK_stop_and_search_location foreign key (location_id) references location(id),
+    constraint FK_stop_and_search_location foreign key (location_id) references location(street_id),
     constraint FK_stop_and_search_outcome_object foreign key (outcome_object_id) references outcome_object(id)
 );
