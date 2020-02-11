@@ -1,14 +1,10 @@
 package by.koshko.crimes.exec;
 
-import by.koshko.crimes.service.exception.ApplicationException;
-import by.koshko.crimes.util.CommandLineParameters;
-import by.koshko.crimes.service.ExecutorServiceBuilder;
 import by.koshko.crimes.config.RootConfig;
+import by.koshko.crimes.util.CommandLineParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.Properties;
 
 public class Application {
 
@@ -17,16 +13,12 @@ public class Application {
     public static void main(String[] args) {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(RootConfig.class);
         CommandLineParameters cmd = new CommandLineParameters().build(args);
-        Properties parameters = cmd.getProperties();
+        String requiredAPI = cmd.getProperties().getProperty(CommandLineParameters.API_OPTION);
+        ApplicationAPIModule module = (ApplicationAPIModule) context.getBean(requiredAPI);
         long start = System.currentTimeMillis();
         try {
-            ExecutorServiceBuilder builder
-                    = (ExecutorServiceBuilder) context.getBean(parameters.getProperty(CommandLineParameters.API_OPTION));
-            builder.build().execute(
-                    parameters.getProperty(CommandLineParameters.FILE_OPTION),
-                    parameters.getProperty(CommandLineParameters.FROM_OPTION),
-                    parameters.getProperty(CommandLineParameters.TO_OPTION));
-        } catch (ApplicationException e) {
+            module.run(cmd.getProperties());
+        } catch (Throwable e) {
             logger.error(e.getMessage());
         }
         System.out.println("Elapsed time: " + (System.currentTimeMillis() - start) + " ms.");

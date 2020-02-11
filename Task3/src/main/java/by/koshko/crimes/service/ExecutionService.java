@@ -1,15 +1,10 @@
 package by.koshko.crimes.service;
 
-import by.koshko.crimes.service.exception.ApplicationException;
 import by.koshko.crimes.service.exception.ServiceException;
 import by.koshko.crimes.service.jsonutil.JsonArrayHandler;
-import by.koshko.crimes.util.CsvFileReader;
-import by.koshko.crimes.util.DateRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -18,44 +13,35 @@ import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 
-public class ExecutionService<T, R> {
+public class ExecutionService<T, U> {
 
-    private static final int TASKS_LIMIT = 15;
     private Logger logger = LoggerFactory.getLogger(ExecutionService.class);
 
+    private static final int TASKS_LIMIT = 10;
+
     private ExecutorService requestProcessor = Executors.newFixedThreadPool(10);
-    private ExecutorService persistProcessor = Executors.newFixedThreadPool(12);
-    private BlockingQueue<Future<String>> tasks = new LinkedBlockingQueue<>(16);
+    private ExecutorService persistProcessor = Executors.newFixedThreadPool(10);
+    private BlockingQueue<Future<String>> tasks = new LinkedBlockingQueue<>(11);
     private AtomicInteger processedResponses = new AtomicInteger();
-    private RequestDataMapper<R> dataMapper;
-    private HttpRequestService<R> requestService;
+    private HttpRequestService<U> requestService;
     private JsonArrayHandler<T> jsonArrayHandler;
     private int totalRequests = 0;
 
-    public ExecutionService(RequestDataMapper<R> dataMapper,
-                            HttpRequestService<R> requestService,
-                            JsonToObjectMapper<T> objectMapper,
+    public ExecutionService(HttpRequestService<U> requestService,
+                            JsonToObjectMapper<T> jsonToObjectMapper,
                             PersistenceService<T> persistenceService) {
-        this.dataMapper = dataMapper;
         this.requestService = requestService;
-        jsonArrayHandler = new JsonArrayHandler<>(objectMapper, persistenceService);
+        jsonArrayHandler = new JsonArrayHandler<>(jsonToObjectMapper, persistenceService);
     }
 
-    public void execute(String file, String startDate, String endDate) throws ApplicationException {
-        DateRange dateRange = DateRange.build(startDate, endDate);
-        List<R> data = readAndMapDataFromFile(file);
-        processDataInDateRange(data, dateRange);
-    }
-
-    private void processDataInDateRange(List<R> coordinates, Iterable<String> range) {
+    public void execute(Iterable<U> requestParams, Iterable<String> range) {
         persistProcessor.execute(() -> {
             processTasksQueue();
             persistProcessor.shutdown();
         });
-        range.forEach(rangeValue -> coordinates.forEach(point -> {
-            Future<String> task = sendRequest(point, rangeValue);
+        range.forEach(rangeValue -> requestParams.forEach(requestParam -> {
+            Future<String> task = sendRequest(requestParam, rangeValue);
             ++totalRequests;
             putTaskInQueue(task);
         }));
@@ -132,16 +118,7 @@ public class ExecutionService<T, R> {
                 totalRequests, processedResponses.get(), totalRequests - processedResponses.get()));
     }
 
-    private Future<String> sendRequest(R point, String date) {
+    private Future<String> sendRequest(U point, String date) {
         return requestProcessor.submit(() -> requestService.sendRequest(point, date));
-    }
-
-    private List<R> readAndMapDataFromFile(String file) throws ApplicationException {
-        try {
-            Stream<String> data = CsvFileReader.getLinesAsStream(file);
-            return dataMapper.map(data);
-        } catch (IOException e) {
-            throw new ApplicationException("Cannot read data from file.", e);
-        }
     }
 }
