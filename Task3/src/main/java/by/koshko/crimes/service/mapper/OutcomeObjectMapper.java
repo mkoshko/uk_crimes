@@ -11,7 +11,7 @@ public class OutcomeObjectMapper implements JsonToObjectMapper<OutcomeObject> {
     @Override
     public OutcomeObject map(JSONObject object) {
         if (object != null) {
-            return new OutcomeObject(object.optString("id"), object.optString("name"));
+            return new OutcomeObject(object.getString("id"), object.getString("name"));
         }
         return null;
     }
