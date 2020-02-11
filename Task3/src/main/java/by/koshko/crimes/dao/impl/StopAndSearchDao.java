@@ -1,7 +1,6 @@
 package by.koshko.crimes.dao.impl;
 
 import by.koshko.crimes.dao.Dao;
-import by.koshko.crimes.entity.Location;
 import by.koshko.crimes.entity.OutcomeObject;
 import by.koshko.crimes.entity.StopAndSearch;
 import org.codejargon.fluentjdbc.api.FluentJdbc;
