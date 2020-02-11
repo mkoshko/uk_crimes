@@ -24,7 +24,6 @@ public class StopAndSearchMapper implements JsonToObjectMapper<StopAndSearch> {
     @Override
     public StopAndSearch map(JSONObject object) {
         if (object != null) {
-
             return new StopAndSearch.StopAndSearchBuilder()
                     .setType(object.optString("type"))
                     .setInvolved_person(object.optBoolean("involved_person", false))
@@ -32,7 +31,7 @@ public class StopAndSearchMapper implements JsonToObjectMapper<StopAndSearch> {
                             ? LocalDateTime.parse(object.getString("datetime"), DateTimeFormatter.ISO_ZONED_DATE_TIME) : null)
                     .setOperation(object.optBoolean("operation", false))
                     .setOperation_name(object.optString("operation_name"))
-                    .setLocation(locationMapper.map(object.getJSONObject("location")))
+                    .setLocation(locationMapper.map(object.optJSONObject("location")))
                     .setGender(object.optString("gender"))
                     .setAge_range(object.optString("age_range"))
                     .setSelf_defined_ethnicity(object.optString("self_defined_ethnicity"))
