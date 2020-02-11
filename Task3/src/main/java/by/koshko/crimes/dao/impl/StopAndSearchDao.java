@@ -1,8 +1,10 @@
 package by.koshko.crimes.dao.impl;
 
 import by.koshko.crimes.dao.Dao;
+import by.koshko.crimes.entity.Location;
 import by.koshko.crimes.entity.OutcomeObject;
 import by.koshko.crimes.entity.StopAndSearch;
+import by.koshko.crimes.entity.Street;
 import org.codejargon.fluentjdbc.api.FluentJdbc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -44,7 +46,12 @@ public class StopAndSearchDao implements Dao<StopAndSearch> {
         params.add(entity.getTimestamp());
         params.add(entity.isOperation());
         params.add(entity.getOperation_name());
-        params.add(entity.getLocation().getStreet().getId());
+        params.add(
+                Optional.ofNullable(entity.getLocation())
+                        .map(Location::getStreet)
+                        .map(Street::getId)
+                        .orElse(null)
+        );
         params.add(entity.getGender());
         params.add(entity.getAge_range());
         params.add(entity.getSelf_defined_ethnicity());
@@ -52,7 +59,11 @@ public class StopAndSearchDao implements Dao<StopAndSearch> {
         params.add(entity.getLegislation());
         params.add(entity.getObject_of_search());
         params.add(entity.getOutcome());
-        params.add(entity.getOutcome_object() != null ? entity.getOutcome_object().getId() : null);
+        params.add(
+                Optional.ofNullable(entity.getOutcome_object())
+                .map(OutcomeObject::getId)
+                .orElse(null)
+        );
         params.add(entity.getOutcome_linked_to_object_of_search());
         params.add(entity.getRemoval_of_more_than_outer_clothing());
         return params;
