@@ -18,11 +18,11 @@ public class ExecutionService<T, U> {
 
     private Logger logger = LoggerFactory.getLogger(ExecutionService.class);
 
-    private static final int TASKS_LIMIT = 10;
+    private static final int TASKS_LIMIT = 15;
 
     private ExecutorService requestProcessor = Executors.newFixedThreadPool(10);
     private ExecutorService persistProcessor = Executors.newFixedThreadPool(10);
-    private BlockingQueue<Future<String>> tasks = new LinkedBlockingQueue<>(11);
+    private BlockingQueue<Future<String>> tasks = new LinkedBlockingQueue<>(16);
     private AtomicInteger processedResponses = new AtomicInteger();
     private HttpRequestService<U> requestService;
     private JsonArrayHandler<T> jsonArrayHandler;
