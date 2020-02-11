@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class StopAndSearchMapper implements JsonToObjectMapper<StopAndSearch> {
@@ -23,12 +24,13 @@ public class StopAndSearchMapper implements JsonToObjectMapper<StopAndSearch> {
     @Override
     public StopAndSearch map(JSONObject object) {
         if (object != null) {
+
             return new StopAndSearch.StopAndSearchBuilder()
                     .setType(object.optString("type"))
                     .setInvolved_person(object.optBoolean("involved_person", false))
                     .setTimestamp(object.optString("datetime") != null
-                            ? LocalDateTime.parse(object.getString("datetime")) : null)
-                    .setOperation(object.optString("operation"))
+                            ? LocalDateTime.parse(object.getString("datetime"), DateTimeFormatter.ISO_ZONED_DATE_TIME) : null)
+                    .setOperation(object.optBoolean("operation", false))
                     .setOperation_name(object.optString("operation_name"))
                     .setLocation(locationMapper.map(object.getJSONObject("location")))
                     .setGender(object.optString("gender"))
