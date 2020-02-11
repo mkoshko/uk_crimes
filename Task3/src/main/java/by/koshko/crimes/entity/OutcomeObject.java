@@ -11,12 +11,6 @@ public class OutcomeObject {
         this.name = name;
     }
 
-    public OutcomeObject(long id, String identity, String name) {
-        this.id = id;
-        this.identity = identity;
-        this.name = name;
-    }
-
     public long getId() {
         return id;
     }
