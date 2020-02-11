@@ -24,9 +24,9 @@ public class OutcomeObjectPersistenceService implements PersistenceService<Outco
     }
 
     private void saveOrGetExisting(OutcomeObject outcomeObject) {
-        long id = outcomeObjectDao.save(outcomeObject);
+        long id = outcomeObjectDao.findId(outcomeObject.getIdentity());
         if (id == 0) {
-            id = outcomeObjectDao.findId(outcomeObject.getIdentity());
+            id = outcomeObjectDao.save(outcomeObject);
         }
         outcomeObject.setId(id);
     }
