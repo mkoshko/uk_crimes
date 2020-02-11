@@ -6,6 +6,11 @@ public class OutcomeObject {
     private String identity;
     private String name;
 
+    public OutcomeObject(String identity, String name) {
+        this.identity = identity;
+        this.name = name;
+    }
+
     public OutcomeObject(long id, String identity, String name) {
         this.id = id;
         this.identity = identity;
