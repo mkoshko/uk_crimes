@@ -75,9 +75,9 @@ build_project() {
 }
 
 run_application() {
-  java -jar "$project_folder/target/crime.jar" -Dapi=street-level-crimes -Dfile="$project_folder/data/LondonStations.csv" -Dfrom=2017-01 -Dto=2017-05
-  java -jar "$project_folder/target/crime.jar" -Dapi=stop-and-search-by-area -Dfile="$project_folder/data/LondonStations.csv" -Dfrom=2017-01 -Dto=2017-05
-  java -jar "$project_folder/target/crime.jar" -Dapi=stop-and-search-by-force -Dfrom=2018-01 -Dto=2018-05
+  java -jar "$project_folder/target/crime.jar" -Dapi=street-level-crimes -Dfile="$project_folder/data/LondonStations.csv" -Dfrom=2019-01 -Dto=2019-05
+  java -jar "$project_folder/target/crime.jar" -Dapi=stop-and-search-by-area -Dfile="$project_folder/data/LondonStations.csv" -Dfrom=2019-01 -Dto=2019-05
+  java -jar "$project_folder/target/crime.jar" -Dapi=stop-and-search-by-force -Dfrom=2019-01 -Dto=2019-05
 }
 
 parse_arguments() {
