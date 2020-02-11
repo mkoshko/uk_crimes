@@ -49,13 +49,13 @@ public class ExecutionService<T, R> {
         processDataInDateRange(data, dateRange);
     }
 
-    private void processDataInDateRange(List<R> coordinates, DateRange dateRange) {
+    private void processDataInDateRange(List<R> coordinates, Iterable<String> range) {
         persistProcessor.execute(() -> {
             processTasksQueue();
             persistProcessor.shutdown();
         });
-        dateRange.forEach(date -> coordinates.forEach(point -> {
-            Future<String> task = sendRequest(point, date);
+        range.forEach(rangeValue -> coordinates.forEach(point -> {
+            Future<String> task = sendRequest(point, rangeValue);
             ++totalRequests;
             putTaskInQueue(task);
         }));
