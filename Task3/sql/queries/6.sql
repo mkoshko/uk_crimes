@@ -58,6 +58,8 @@ WITH crimes AS (
     GROUP BY crimes.location_id, "CRCount", "SSCount", crimes."Month"
 )
 SELECT street_id,
+       name,
+       d."Month",
        "drugs",
        "Controlled drugs",
        "Possession of weapons",
@@ -65,10 +67,8 @@ SELECT street_id,
        "theft from the person/shoplifting",
        "stolen goods"
 FROM location
+         INNER JOIN street ON location.street_id = street.id
          FULL OUTER JOIN drugs_to_controlled_drugs d ON street_id = d.location_id
-         FULL OUTER JOIN pow_to_of_frms p ON street_id = p.location_id
-         FULL OUTER JOIN tftp_sh_to_sg t ON street_id = t.location_id
-WHERE street_id = d.location_id
-   OR street_id = p.location_id
-   OR street_id = t.location_id
-
+         FULL OUTER JOIN pow_to_of_frms p ON street_id = p.location_id AND p."Month" = d."Month"
+         FULL OUTER JOIN tftp_sh_to_sg t ON street_id = t.location_id AND t."Month" = d."Month"
+WHERE street_id IN (SELECT d.location_id) OR street_id IN (SELECT p.location_id) OR street_id IN (SELECT t.location_id)
