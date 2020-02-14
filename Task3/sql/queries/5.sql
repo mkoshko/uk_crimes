@@ -16,6 +16,7 @@ WITH "all" AS (
       AND object_of_search<>''
       AND outcome<>''
       AND location_id IS NOT NULL
+      AND datetime BETWEEN '2019-01-01' AND '2019-06-01'
     GROUP BY location_id, age_range, gender, officer_defined_ethnicity, object_of_search, outcome
 )
 SELECT DISTINCT location_id,
