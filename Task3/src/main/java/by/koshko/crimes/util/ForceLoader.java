@@ -2,7 +2,7 @@ package by.koshko.crimes.util;
 
 import by.koshko.crimes.entity.Force;
 import by.koshko.crimes.service.exception.ServiceException;
-import by.koshko.crimes.service.impl.AvailableForcesHttpRequest;
+import by.koshko.crimes.service.request.AvailableForcesHttpRequest;
 import by.koshko.crimes.service.jsonutil.JsonArrayStreamSupport;
 import by.koshko.crimes.service.mapper.ForceMapper;
 import org.json.JSONArray;

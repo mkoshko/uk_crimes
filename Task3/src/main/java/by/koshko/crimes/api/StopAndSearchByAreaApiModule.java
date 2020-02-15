@@ -4,7 +4,7 @@ import by.koshko.crimes.entity.AvailableApi;
 import by.koshko.crimes.entity.StopAndSearch;
 import by.koshko.crimes.service.JsonToObjectMapper;
 import by.koshko.crimes.service.PersistenceService;
-import by.koshko.crimes.service.impl.PointHttpRequestService;
+import by.koshko.crimes.service.request.PointHttpRequestService;
 import by.koshko.crimes.service.mapper.PointMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

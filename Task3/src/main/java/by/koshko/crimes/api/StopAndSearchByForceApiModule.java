@@ -5,7 +5,7 @@ import by.koshko.crimes.entity.Force;
 import by.koshko.crimes.service.ExecutionService;
 import by.koshko.crimes.service.exception.ApplicationException;
 import by.koshko.crimes.service.exception.ServiceException;
-import by.koshko.crimes.service.impl.ForceHttpRequestService;
+import by.koshko.crimes.service.request.ForceHttpRequestService;
 import by.koshko.crimes.service.mapper.StopAndSearchMapper;
 import by.koshko.crimes.service.persistence.StopAndSearchPersistenceService;
 import by.koshko.crimes.util.CommandLineParameters;

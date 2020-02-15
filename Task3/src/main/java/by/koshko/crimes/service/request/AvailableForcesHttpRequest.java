@@ -1,4 +1,4 @@
-package by.koshko.crimes.service.impl;
+package by.koshko.crimes.service.request;
 
 public class AvailableForcesHttpRequest extends AbstractHttpRequestService<Object> {
 

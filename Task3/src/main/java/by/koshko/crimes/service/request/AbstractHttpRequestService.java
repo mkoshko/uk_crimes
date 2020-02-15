@@ -1,4 +1,4 @@
-package by.koshko.crimes.service.impl;
+package by.koshko.crimes.service.request;
 
 import by.koshko.crimes.service.HttpRequestService;
 import by.koshko.crimes.service.exception.ServiceException;

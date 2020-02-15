@@ -5,7 +5,7 @@ import by.koshko.crimes.service.ExecutionService;
 import by.koshko.crimes.service.JsonToObjectMapper;
 import by.koshko.crimes.service.PersistenceService;
 import by.koshko.crimes.service.exception.ApplicationException;
-import by.koshko.crimes.service.impl.PointHttpRequestService;
+import by.koshko.crimes.service.request.PointHttpRequestService;
 import by.koshko.crimes.service.mapper.PointMapper;
 import by.koshko.crimes.util.CommandLineParameters;
 import by.koshko.crimes.util.CsvFileReader;
