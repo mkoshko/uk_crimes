@@ -8,6 +8,7 @@ tb3="category_name"
 tb4="street"
 tb5="outcome_status"
 project_folder=
+query=
 
 
 help() {
@@ -16,6 +17,7 @@ help() {
   echo "  -f <project folder>,   path to the project."
   echo "  -B,                    build maven project from specified path."
   echo "  -D,                    drop tables data."
+  echo "  -Q <index>,            index of a query."
   echo "  -v,                    display non-script output."
 }
 
@@ -80,8 +82,12 @@ run_application() {
   java -jar "$project_folder/target/crime.jar" -Dapi=stop-and-search-by-force -Dfrom=2019-01 -Dto=2019-05
 }
 
+anazyle() {
+  java -jar "$project_folder/target/crime.jar" -Dtarget="$query"
+}
+
 parse_arguments() {
-  while getopts DBvhf: opt "$@"; do
+  while getopts DBvhQf: opt "$@"; do
   case $opt in
     v)
     quiet="-"
@@ -99,6 +105,11 @@ parse_arguments() {
     ;;
     B)
     build_project "$project_folder"
+    ;;
+    Q)
+    query=$OPTARG
+    anazyle
+    exit 0;
     ;;
     *)
     echo "Unknown argument."
