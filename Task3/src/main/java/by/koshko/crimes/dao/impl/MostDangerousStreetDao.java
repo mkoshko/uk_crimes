@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository("query1")
+@Repository
 public class MostDangerousStreetDao implements QueryDao<MostDangerousStreet> {
 
     private FluentJdbc fluentJdbc;
