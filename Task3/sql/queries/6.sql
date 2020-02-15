@@ -1,74 +1,94 @@
-WITH crimes AS (
-    SELECT location_id,
+with crimes as (
+    select location_id,
            category,
-           month AS "Month",
-           count(*) OVER (PARTITION BY location_id, category, month) AS "CRCount"
-    FROM crime
-    WHERE (category='drugs'
-        OR category='possession-of-weapons'
-        OR category='theft-from-the-person'
-        OR category='shoplifting')
-      AND month BETWEEN '2019-01' AND '2019-06'
-      AND location_id IS NOT NULL
-    ORDER BY month
-), stopAndSearch AS (
-    SELECT location_id,
+           month
+    from crime
+    where (category = 'drugs'
+        or category = 'possession-of-weapons'
+        or category = 'theft-from-the-person'
+        or category = 'shoplifting')
+      and (month between '2019-01' and '2019-06')
+      and location_id is not null
+), stop_search as (
+    select location_id,
            object_of_search,
-           to_char(datetime, 'yyyy-MM') AS "Month",
-           count(*) OVER (PARTITION BY location_id, object_of_search, to_char(datetime, 'yyyy-MM')) as "SSCount"
-    FROM stop_and_search
-    WHERE location_id IS NOT NULL
-      AND to_char(datetime, 'yyyy-MM') BETWEEN '2019-01' AND '2019-05'
-      AND (object_of_search='Controlled drugs'
-        OR object_of_search='Firearms'
-        OR object_of_search='Offensive weapons'
-        OR object_of_search='Stolen goods')
-    ORDER BY datetime
-), drugs_to_controlled_drugs AS (
-    SELECT DISTINCT crimes.location_id,
-                    "CRCount" AS "drugs",
-                    "SSCount" AS "Controlled drugs", crimes."Month"
-    FROM crimes
-             INNER JOIN stopAndSearch ON crimes.location_id = stopAndSearch.location_id
-    WHERE category = 'drugs'
-      AND object_of_search = 'Controlled drugs'
-      AND crimes."Month" = stopAndSearch."Month"
-), pow_to_of_frms AS (
-    SELECT DISTINCT crimes.location_id,
-                    "CRCount" AS "Possession of weapons",
-                    SUM("SSCount") OVER (PARTITION BY crimes.location_id, "CRCount", crimes."Month") AS "offensive weapons/firearms",
-                    crimes."Month"
-    FROM crimes
-             INNER JOIN stopAndSearch ON crimes.location_id = stopAndSearch.location_id
-    WHERE category = 'possession-of-weapons'
-      AND (object_of_search = 'Offensive weapons' OR object_of_search = 'Firearms')
-      AND crimes."Month" = stopAndSearch."Month"
-    GROUP BY crimes.location_id, "CRCount", "SSCount", crimes."Month"
-), tftp_sh_to_sg AS (
-    SELECT DISTINCT crimes.location_id,
-                    SUM("CRCount")
-                    OVER (PARTITION BY crimes.location_id, "SSCount", crimes."Month") AS "theft from the person/shoplifting",
-                    "SSCount"                                                         AS "stolen goods",
-                    crimes."Month"
-    FROM crimes
-             INNER JOIN stopAndSearch ON crimes.location_id = stopAndSearch.location_id
-    WHERE (category = 'theft-from-the-person' OR category = 'shoplifting')
-      AND object_of_search = 'Stolen goods'
-      AND crimes."Month" = stopAndSearch."Month"
-    GROUP BY crimes.location_id, "CRCount", "SSCount", crimes."Month"
+           to_char(datetime, 'yyyy-MM') as "date"
+    from stop_and_search
+    where (object_of_search = 'Controlled drugs'
+        or object_of_search = 'Firearms'
+        or object_of_search = 'Offensive weapons'
+        or object_of_search = 'Stolen goods')
+      and (to_char(datetime, 'yyyy-MM') between '2019-01' and '2019-06')
+      and outcome = 'Arrest'
+      and location_id is not null
+), data as (
+    select distinct location_id,
+                    month
+    from crimes
+    union distinct
+    select location_id,
+           "date"
+    from stop_search
 )
-SELECT street_id,
+select d.location_id,
        name,
-       d."Month",
-       "drugs",
-       "Controlled drugs",
-       "Possession of weapons",
-       "offensive weapons/firearms",
-       "theft from the person/shoplifting",
-       "stolen goods"
-FROM location
-         INNER JOIN street ON location.street_id = street.id
-         FULL OUTER JOIN drugs_to_controlled_drugs d ON street_id = d.location_id
-         FULL OUTER JOIN pow_to_of_frms p ON street_id = p.location_id AND p."Month" = d."Month"
-         FULL OUTER JOIN tftp_sh_to_sg t ON street_id = t.location_id AND t."Month" = d."Month"
-WHERE street_id IN (SELECT d.location_id) OR street_id IN (SELECT p.location_id) OR street_id IN (SELECT t.location_id)
+       d.month,
+       CRDrugs.drugs,
+       SSDrugs."controlled drugs",
+       CRWeapons."possession of weapons",
+       SSWeapons."Offensive weapons/Firearms",
+       CRTheft."theft from the person/shoplifting",
+       SSTheft."Stolen goods"
+from "data" d
+         left join (
+    select location_id,
+           month,
+           count(*) as "drugs"
+    from crimes
+    where category='drugs'
+    group by location_id, month
+) as CRDrugs on d.location_id=CRDrugs.location_id and d.month = CRDrugs.month
+         left join street on d.location_id = street.id
+         left join (
+    select location_id,
+           "date",
+           count(*) as "controlled drugs"
+    from stop_search
+    where object_of_search='Controlled drugs'
+    group by location_id, "date"
+) SSDrugs on d.location_id = SSDrugs.location_id and d.month = SSDrugs.date
+         left join (
+    select location_id,
+           month,
+           count(*) as "possession of weapons"
+    from crimes
+    where category='possession-of-weapons'
+    group by location_id, month
+) CRWeapons on d.location_id = CRWeapons.location_id and d.month = CRWeapons.month
+         left join (
+    select location_id,
+           "date",
+           count(*) as "Offensive weapons/Firearms"
+    from stop_search
+    where object_of_search='Offensive weapons'
+       or object_of_search='Firearms'
+    group by location_id, "date"
+) SSWeapons on d.location_id = SSWeapons.location_id and d.month = SSWeapons.date
+         left join (
+    select location_id,
+           month,
+           count(*) as "theft from the person/shoplifting"
+    from crimes
+    where category='theft-from-the-person'
+       or category='shoplifting'
+    group by location_id, month
+) CRTheft on d.location_id = CRTheft.location_id and d.month = CRTheft.month
+         left join (
+    select location_id,
+           "date",
+           count(*) as "Stolen goods"
+    from stop_search
+    where object_of_search='Stolen goods'
+    group by location_id, "date"
+) SSTheft on d.location_id = SSTheft.location_id and d.month = SSTheft.date
+order by location_id
