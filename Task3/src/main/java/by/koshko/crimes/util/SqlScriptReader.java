@@ -7,15 +7,14 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 
 public class SqlScriptReader {
 
     private static final Logger logger = LoggerFactory.getLogger(SqlScriptReader.class);
 
-    public static String readSql(int index) throws ApplicationException {
+    public static String readSql(String file) throws ApplicationException {
         try {
-            return Arrays.toString(Files.readAllBytes(Path.of(String.valueOf(index) + ".sql")));
+            return new String(Files.readAllBytes(Path.of(file)));
         } catch (IOException e) {
             throw new ApplicationException("Cannot read sql file.", e);
         }
