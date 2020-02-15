@@ -42,6 +42,6 @@ public class StopSearchStatByEthnicity {
 
     @Override
     public String toString() {
-        return String.format("%s;%f;%f;%f;%s", ethnicity, arrestRate, noActionRate, otherActionRate, objectOfSearch);
+        return String.format("%s;%.2f;%.2f;%.2f;%s", ethnicity, arrestRate, noActionRate, otherActionRate, objectOfSearch);
     }
 }
