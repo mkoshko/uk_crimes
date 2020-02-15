@@ -9,6 +9,7 @@ tb4="street"
 tb5="outcome_status"
 project_folder=
 query=
+rows=
 
 
 help() {
@@ -83,11 +84,11 @@ run_application() {
 }
 
 anazyle() {
-  java -jar "$project_folder/target/crime.jar" -Dtarget="$query"
+  java -jar "$project_folder/target/crime.jar" -Dapi="$query" -Drows="$rows" -Dfile="$project_folder/sql/queries/"
 }
 
 parse_arguments() {
-  while getopts DBvhQf: opt "$@"; do
+  while getopts DBvhrQf: opt "$@"; do
   case $opt in
     v)
     quiet="-"
@@ -105,6 +106,9 @@ parse_arguments() {
     ;;
     B)
     build_project "$project_folder"
+    ;;
+    r)
+    rows=$OPTARG
     ;;
     Q)
     query=$OPTARG
