@@ -38,6 +38,6 @@ public class CrimeWithSpecOutcome {
 
     @Override
     public String toString() {
-        return String.format("%d;%s;%s;%d;%f", id, name, category, crimesNumber, percentage);
+        return String.format("%d;%s;%s;%d;%.2f", id, name, category, crimesNumber, percentage);
     }
 }

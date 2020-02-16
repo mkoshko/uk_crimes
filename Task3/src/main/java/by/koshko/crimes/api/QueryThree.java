@@ -22,6 +22,8 @@ public class QueryThree implements ApplicationApiModule {
     @Override
     public void run(Properties parameters) {
         try {
+            parameters.put("name", "crimes-with-specified-outcome-status");
+            parameters.put("header", "street id,street name,outcome category,count of crimes,percentage of total crimes");
             new QueryService<>(dao).analyze(parameters);
         } catch (ApplicationException e) {
             LoggerFactory.getLogger(getClass()).error(e.getMessage());

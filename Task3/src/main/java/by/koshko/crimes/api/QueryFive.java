@@ -22,6 +22,8 @@ public class QueryFive implements ApplicationApiModule {
     @Override
     public void run(Properties parameters) {
         try {
+            parameters.put("name", "most-probable-Stop-and-Search-snapshot-on-street-level");
+            parameters.put("header", "street id,street name,age range,gender,ethnicity,object of search,outcome");
             new QueryService<>(dao).analyze(parameters);
         } catch (ApplicationException e) {
             LoggerFactory.getLogger(getClass()).error(e.getMessage());

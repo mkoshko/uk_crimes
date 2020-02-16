@@ -16,7 +16,7 @@ public class CrimeVolumeComparisonMapper implements Mapper<CrimeVolumeComparison
                 rs.getInt(3),
                 rs.getInt(4),
                 rs.getInt(5),
-                rs.getInt(6)
+                rs.getFloat(6)
         );
     }
 }

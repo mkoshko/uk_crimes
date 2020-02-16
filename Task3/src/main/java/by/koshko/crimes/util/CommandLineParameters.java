@@ -18,8 +18,6 @@ public class CommandLineParameters {
     public static final String API_OPTION = "api";
     public static final String FROM_OPTION = "from";
     public static final String TO_OPTION = "to";
-    public static final String MODULE = "module";
-    public static final String TARGET_OPTION = "target";
     public static final String PRINT_ROWS = "rows";
 
     private Options options = new Options();

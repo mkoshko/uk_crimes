@@ -24,11 +24,12 @@ public class QueryService<T> {
         String sqlFolder = parameters.getProperty(CommandLineParameters.FILE_OPTION);
         String sql = SqlScriptReader.readSql(sqlFolder + queryIndex + ".sql");
         List<T> data = queryDao.get(sql);
-        printRows(data, printRows);
-        ReportWriter.writeReport(data);
+        printRows(data, printRows, parameters.getProperty("header"));
+        ReportWriter.writeReport(data, parameters.getProperty("name"), parameters.getProperty("header"));
     }
 
-    private void printRows(List<T> data, int rows) {
+    private void printRows(List<T> data, int rows, String header) {
+        System.out.println(header);
         data.stream().limit(rows).forEach(System.out::println);
     }
 }

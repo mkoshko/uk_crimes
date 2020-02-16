@@ -22,6 +22,8 @@ public class QueryTwo implements ApplicationApiModule {
     @Override
     public void run(Properties parameters) {
         try {
+            parameters.put("name", "month-to-month-crime-volume-comparison");
+            parameters.put("header", "category,month,previous month count,current month count,delta,basic growth rate");
             new QueryService<>(dao).analyze(parameters);
         } catch (ApplicationException e) {
             LoggerFactory.getLogger(getClass()).error(e.getMessage());

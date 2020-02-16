@@ -13,6 +13,7 @@ public class MostDangerousStreetMapper implements Mapper<MostDangerousStreet> {
         return new MostDangerousStreet(
                     rs.getLong(1),
                     rs.getString(2),
-                    rs.getInt(3));
+                    rs.getString(3),
+                    rs.getInt(4));
     }
 }

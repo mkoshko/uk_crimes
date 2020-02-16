@@ -7,14 +7,14 @@ public class CrimeVolumeComparison {
     private Integer previousMonth;
     private Integer currentMonth;
     private Integer delta;
-    private Integer growth;
+    private float growth;
 
     public CrimeVolumeComparison(String category,
                                  String month,
                                  Integer previousMonth,
                                  Integer currentMonth,
                                  Integer delta,
-                                 Integer growth) {
+                                 float growth) {
         this.category = category;
         this.month = month;
         this.previousMonth = previousMonth;
@@ -43,12 +43,12 @@ public class CrimeVolumeComparison {
         return delta;
     }
 
-    public Integer getGrowth() {
+    public float getGrowth() {
         return growth;
     }
 
     @Override
     public String toString() {
-        return String.format("%s;%s;%d;%d;%d;%d;", category, month, previousMonth, currentMonth, delta, growth);
+        return String.format("%s;%s;%d;%d;%d;%.2f;", category, month, previousMonth, currentMonth, delta, growth);
     }
 }

@@ -10,12 +10,14 @@ public class StopSearchStatByEthnicityMapper implements Mapper<StopSearchStatByE
 
     @Override
     public StopSearchStatByEthnicity map(ResultSet rs) throws SQLException {
+        int index = 0;
         return new StopSearchStatByEthnicity(
-                rs.getString(1),
-                rs.getFloat(2),
-                rs.getFloat(3),
-                rs.getFloat(4),
-                rs.getString(5)
+                rs.getString(++index),
+                rs.getInt(++index),
+                rs.getFloat(++index),
+                rs.getFloat(++index),
+                rs.getFloat(++index),
+                rs.getString(++index)
         );
     }
 }

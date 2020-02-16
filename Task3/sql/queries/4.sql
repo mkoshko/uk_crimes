@@ -1,5 +1,8 @@
 WITH "all" AS (
-    SELECT officer_defined_ethnicity, outcome, COUNT(*) AS "Total", SUM(COUNT(*)) OVER (PARTITION BY officer_defined_ethnicity) AS "sum"
+    SELECT officer_defined_ethnicity,
+           outcome,
+           COUNT(*) AS "Total",
+           SUM(COUNT(*)) OVER (PARTITION BY officer_defined_ethnicity) AS "sum"
     FROM stop_and_search
     WHERE officer_defined_ethnicity <> ''
       AND outcome <> ''
@@ -25,7 +28,10 @@ WITH "all" AS (
 ), mp_obj AS (
     SELECT officer_defined_ethnicity, object_of_search
     FROM (
-             SELECT officer_defined_ethnicity, object_of_search, max(count(*)) over (partition by officer_defined_ethnicity) as "MAX", count(*) as "Total"
+             SELECT officer_defined_ethnicity,
+                    object_of_search,
+                    max(count(*)) over (partition by officer_defined_ethnicity) as "MAX",
+                    count(*) as "Total"
              FROM stop_and_search
              WHERE officer_defined_ethnicity <> ''
                AND object_of_search <> ''
@@ -33,7 +39,12 @@ WITH "all" AS (
          ) AS mpobj
     WHERE "Total" = "MAX"
 )
-SELECT DISTINCT "all".officer_defined_ethnicity, "Arrest rate", "No action rate", "Other actions rate", object_of_search
+SELECT DISTINCT "all".officer_defined_ethnicity,
+                "all"."sum" AS "Total",
+                "Arrest rate",
+                "No action rate",
+                "Other actions rate",
+                object_of_search
 FROM "all"
          INNER JOIN arr ON "all".officer_defined_ethnicity = arr.officer_defined_ethnicity
          INNER JOIN no_act ON "all".officer_defined_ethnicity = no_act.officer_defined_ethnicity
