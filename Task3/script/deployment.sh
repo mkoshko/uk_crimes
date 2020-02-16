@@ -27,6 +27,7 @@ check_postgres() {
   status=$(service postgresql-10 status | grep "running");
   if [[ -z "$status" ]]; then
     service postgresql-10 start
+    sleep 10
   fi
 }
 
