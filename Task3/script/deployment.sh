@@ -7,6 +7,8 @@ tb2="location"
 tb3="category_name"
 tb4="street"
 tb5="outcome_status"
+tb6="stop_and_search"
+tb7="outcome_object"
 project_folder=
 query=
 rows=
@@ -36,6 +38,7 @@ clear_database() {
 create_tables() {
   echo "Creating tables..."
   psql -U "$dbuser" "$dbname" -q -f "$project_folder/sql/create_schema_script.sql"
+  psql -U "$dbuser" "$dbname" -q -f "$project_folder/sql/stop-and-search.sql"
   if [[ "$?" -eq 0 ]]; then
     echo "Done."
   else
@@ -48,8 +51,8 @@ create_tables_if_not_exists() {
   if [[ "$tables" == "Did not find any relations." ]]; then
     create_tables
   else
-    local numOfTables=$(echo "$tables" | grep -e "$tb1" -e "$tb2" -e "$tb3" -e "$tb4" -e "$tb5" -c)
-    if [[ $numOfTables -ne 5 ]]; then
+    local numOfTables=$(echo "$tables" | grep -e "$tb1" -e "$tb2" -e "$tb3" -e "$tb4" -e "$tb5" -e "$tb6" -e "$tb7" -c)
+    if [[ $numOfTables -ne 7 ]]; then
       create_tables
     else
       echo "Tables already exists."
@@ -63,10 +66,11 @@ query_to_database() {
 
 drop_table_data() {
   echo "Table cleaning..."
-  query_to_database "TRUNCATE $tb1, $tb2, $tb3, $tb4, $tb5" >/dev/null
+  query_to_database "TRUNCATE $tb1, $tb2, $tb3, $tb4, $tb5, $tb6, $tb7" >/dev/null
   query_to_database "ALTER SEQUENCE category_name_id_seq RESTART;" >/dev/null
-  query_to_database "ALTER SEQUENCE location_id_seq RESTART;" >/dev/null
+  query_to_database "ALTER SEQUENCE stop_and_search_id_seq RESTART;" >/dev/null
   query_to_database "ALTER SEQUENCE outcome_status_id_seq RESTART;" >/dev/null
+  query_to_database "ALTER SEQUENCE outcome_object_id_seq RESTART;" >/dev/null
   echo "Done."
 }
 
