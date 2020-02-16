@@ -1,5 +1,4 @@
 #!/bin/bash
-quiet=" -q "
 dbuser="postgres"
 dbname="crimebox"
 tb1="crime"
@@ -29,7 +28,6 @@ help() {
   echo "                            -all download from all available api methods"
   echo "  -q <index>,            Index of a query (1-6)."
   echo "  -r <number>,           Number of rows to output. Default value is 0."
-  echo "  -v,                    Display non-script output."
 }
 
 check_postgres() {
@@ -44,8 +42,8 @@ check_postgres() {
 
 create_tables() {
   echo "Creating tables..."
-  psql"$quiet"-U "$dbuser" "$dbname" -q -f "$project_folder/sql/create_schema_script.sql"
-  psql"$quiet"-U "$dbuser" "$dbname" -q -f "$project_folder/sql/stop-and-search.sql"
+  psql -U "$dbuser" "$dbname" -q -f "$project_folder/sql/create_schema_script.sql"
+  psql -U "$dbuser" "$dbname" -q -f "$project_folder/sql/stop-and-search.sql"
   echo "Done."
 }
 
@@ -64,7 +62,7 @@ create_tables_if_not_exists() {
 }
 
 query_to_database() {
-  psql"$quiet"-U "$dbuser" "$dbname" -c "$1"
+  psql -U "$dbuser" "$dbname" -c "$1"
 }
 
 drop_table_data() {
@@ -79,7 +77,7 @@ drop_table_data() {
 
 build_project() {
   echo "Building project..."
-  mvn"$quiet"-f "$project_folder" clean package
+  mvn -q -f "$project_folder" clean package
   echo "Done"
 }
 
@@ -103,13 +101,10 @@ analyze() {
 }
 
 parse_arguments() {
-  while getopts dbvhr:q:f:w: opt "$@"; do
+  while getopts dbhr:q:f:w: opt "$@"; do
   case $opt in
     f)
     project_folder="$OPTARG"
-    ;;
-    v)
-    quiet=" "
     ;;
     h)
     help
