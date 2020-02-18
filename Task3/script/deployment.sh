@@ -13,6 +13,7 @@ rows=0
 anazyleQuery=0
 api=("" "street-level-crimes" "stop-and-search-by-area" "stop-and-search-by-force")
 selectedApi=0
+filenames=("" "most-dangerous-street" "month-to-month-crime-volume-comparison" "crimes-with-specified-outcome-status" "stop-and-search-statistics-by-ethnicity" "most-probable-Stop-and-Search-snapshot-on-street-level" "stop-and-Search-correlation-with-crimes")
 
 
 help() {
@@ -28,6 +29,12 @@ help() {
   echo "                            -all download from all available api methods"
   echo "  -q <index>,            Index of a query (1-6)."
   echo "  -r <number>,           Number of rows to output. Default value is 0."
+}
+
+print_table() {
+  echo "$rows"
+  local filename="${filenames[$1]}"
+  head -n "$rows" "$filename"*.txt | column -t -s ";"
 }
 
 check_postgres() {
@@ -101,7 +108,7 @@ analyze() {
 }
 
 parse_arguments() {
-  while getopts dbhr:q:f:w: opt "$@"; do
+  while getopts dbhr:q:f:w:t: opt "$@"; do
   case $opt in
     f)
     project_folder="$OPTARG"
@@ -126,6 +133,10 @@ parse_arguments() {
     q)
     anazyleQuery="$OPTARG"
     ;;
+    t)
+    print_table "$OPTARG"
+    exit 0
+    ;;   
     *)
     echo "Unknown argument."
     help
