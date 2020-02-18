@@ -23,7 +23,7 @@ public class QueryOne implements ApplicationApiModule {
     public void run(Properties parameters) {
         try {
             parameters.put("name", "most-dangerous-street");
-            parameters.put("header", "street id,street name,period,count");
+            parameters.put("header", "street id;street name;period;count");
             new QueryService<>(dao).analyze(parameters);
         } catch (ApplicationException e) {
             LoggerFactory.getLogger(getClass()).error(e.getMessage());

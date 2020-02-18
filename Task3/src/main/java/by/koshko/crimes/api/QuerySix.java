@@ -23,8 +23,8 @@ public class QuerySix implements ApplicationApiModule {
     public void run(Properties parameters) {
         try {
             parameters.put("name", "stop-and-Search-correlation-with-crimes");
-            parameters.put("header", "street id,street name,month,drugs crimes count,drugs stop-and-search count,"
-                    + "weapons crimes count,weapons stop-and-search count,theft crimes count,"
+            parameters.put("header", "street id;street name;month;drugs crimes count;drugs stop-and-search count;"
+                    + "weapons crimes count;weapons stop-and-search count;theft crimes count;"
                     + "theft stop-and-search count");
             new QueryService<>(dao).analyze(parameters);
         } catch (ApplicationException e) {

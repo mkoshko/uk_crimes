@@ -23,8 +23,8 @@ public class QueryFour implements ApplicationApiModule {
     public void run(Properties parameters) {
         try {
             parameters.put("name", "stop-and-search-statistics-by-ethnicity");
-            parameters.put("header", "ethnicity,total number for ethnicity,arrest rate,no action rate,"
-                    + "other outcome rate,most popular object of search");
+            parameters.put("header", "ethnicity;total number for ethnicity;arrest rate;no action rate;"
+                    + "other outcome rate;most popular object of search");
             new QueryService<>(dao).analyze(parameters);
         } catch (ApplicationException e) {
             LoggerFactory.getLogger(getClass()).error(e.getMessage());
