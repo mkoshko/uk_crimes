@@ -1,4 +1,4 @@
-WITH crimes AS (
+WITH by.koshko.crimes AS (
     SELECT location_id,
            category,
            month
@@ -24,7 +24,7 @@ WITH crimes AS (
 ), data AS (
     SELECT distinct location_id,
                     month
-    FROM crimes
+    FROM by.koshko.crimes
     UNION DISTINCT
     SELECT location_id,
            "date"
@@ -44,7 +44,7 @@ LEFT JOIN (
     SELECT location_id,
            month,
            count(*) AS "drugs"
-    FROM crimes
+    FROM by.koshko.crimes
     WHERE category='drugs'
     GROUP BY location_id, month
 ) AS CRDrugs ON d.location_id=CRDrugs.location_id AND d.month = CRDrugs.month
@@ -61,7 +61,7 @@ LEFT JOIN (
     SELECT location_id,
            month,
            count(*) AS "possessiON of weapons"
-    FROM crimes
+    FROM by.koshko.crimes
     WHERE category='possession-of-weapons'
     GROUP BY location_id, month
 ) CRWeapons ON d.location_id = CRWeapons.location_id AND d.month = CRWeapons.month
@@ -78,7 +78,7 @@ LEFT JOIN (
     SELECT location_id,
            month,
            count(*) AS "theft FROM the person/shoplifting"
-    FROM crimes
+    FROM by.koshko.crimes
     WHERE category='theft-FROM-the-person'
        OR category='shoplifting'
     GROUP BY location_id, month

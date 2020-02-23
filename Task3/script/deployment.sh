@@ -49,7 +49,7 @@ create_tables_if_not_exists() {
         isTableMissed=1
       fi
     done
-    if [[ -$isTableMissed -eq 1 ]]; then
+    if [[ $isTableMissed -eq 1 ]]; then
       create_tables
       echo "Tables was successfully created."
       return 0
@@ -83,13 +83,17 @@ build_project() {
 }
 
 run_application() {
-  if [[ "$selectedApi" == "all" ]]; then
+  if [[ $selectedApi -eq 0 ]]; then
+    return 0
+  elif [[ "$selectedApi" == "all" ]]; then
+    check_postgres
+    create_tables_if_not_exists
     for i in "${api[@]:1:3}"; do
       java -jar "$project_folder/target/crime.jar" -Dapi="$i" -Dfile="$project_folder/data/LondonStations.csv" -Dfrom=2019-01 -Dto=2019-05
     done
-  elif [[ $selectedApi -eq 0 ]]; then
-    return 0
   else
+    check_postgres
+    create_tables_if_not_exists
     java -jar "$project_folder/target/crime.jar" -Dapi="${api[selectedApi]}" -Dfile="$project_folder/data/LondonStations.csv" -Dfrom=2019-01 -Dto=2019-05
   fi
 }
@@ -124,6 +128,4 @@ parse_arguments() {
 }
 
 parse_arguments "$@"
-check_postgres
-create_tables_if_not_exists
 run_application
