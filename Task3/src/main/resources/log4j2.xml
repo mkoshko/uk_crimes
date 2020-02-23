@@ -5,15 +5,21 @@
         xmlns="http://logging.apache.org/log4j/2.0/config">
     <Properties>
         <Property name="defaultPattern">%d{dd MMM yyyy HH:mm:ss} [%-4level] [%t] %c{4} - %msg%n</Property>
+        <Property name="errorLogFile">logs/errors.log</Property>
     </Properties>
     <Appenders>
         <Appender type="console" name="console" >
             <Layout type="PatternLayout" pattern="${defaultPattern}"/>
         </Appender>
+        <Appender type="File" name="fileAppender" fileName="${errorLogFile}">
+            <Layout type="PatternLayout" pattern="%d{dd MMM yyyy HH:mm:ss} [%-4level] [%t] %c{1} - %msg%n" />
+            <Filter type="ThresholdFilter" level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Appender>
     </Appenders>
     <Loggers>
-        <Root level="info">
+        <Root level="All">
             <AppenderRef ref="console" />
+            <AppenderRef ref="fileAppender"/>
         </Root>
     </Loggers>
 </Configuration>

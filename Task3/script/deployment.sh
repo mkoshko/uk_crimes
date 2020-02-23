@@ -1,20 +1,10 @@
 #!/bin/bash
 dbuser="postgres"
 dbname="crimebox"
-tb1="crime"
-tb2="location"
-tb3="category_name"
-tb4="street"
-tb5="outcome_status"
-tb6="stop_and_search"
-tb7="outcome_object"
+tables=("crime" "location" "category_name" "stop_and_search" "street" "outcome_object" "outcome_status")
 project_folder=
-rows=0
-anazyleQuery=0
 api=("" "street-level-crimes" "stop-and-search-by-area" "stop-and-search-by-force")
 selectedApi=0
-filenames=("" "most-dangerous-street" "month-to-month-crime-volume-comparison" "crimes-with-specified-outcome-status" "stop-and-search-statistics-by-ethnicity" "most-probable-Stop-and-Search-snapshot-on-street-level" "stop-and-Search-correlation-with-crimes")
-
 
 help() {
   echo "Usage: deployment.sh [OPTION]..."
@@ -27,14 +17,6 @@ help() {
   echo "                            -2   stop and search by area"
   echo "                            -3   stop and search by force"
   echo "                            -all download from all available api methods"
-  echo "  -q <index>,            Index of a query (1-6)."
-  echo "  -r <number>,           Number of rows to output. Default value is 0."
-}
-
-print_table() {
-  echo "$rows"
-  local filename="${filenames[$1]}"
-  head -n "$rows" "$filename"*.txt | column -t -s ";"
 }
 
 check_postgres() {
@@ -55,13 +37,22 @@ create_tables() {
 }
 
 create_tables_if_not_exists() {
-  local tables=$(psql -U "$dbuser" "$dbname" -c \\dt)
-  if [[ -z "$tables" ]]; then
+  local dbtables=
+  local isTableMissed=
+  dbtables=$(psql -U "$dbuser" "$dbname" -c \\dt)
+  if [[ -z "$dbtables" ]]; then
     create_tables
   else
-    local numOfTables=$(echo "$tables" | grep -e "$tb1" -e "$tb2" -e "$tb3" -e "$tb4" -e "$tb5" -e "$tb6" -e "$tb7" -c)
-    if [[ $numOfTables -ne 7 ]]; then
+    for i in "${tables[@]}"; do
+      if [[ ! $dbtables =~ $i ]]; then
+        echo "Table $i doesn't exists."
+        isTableMissed=1
+      fi
+    done
+    if [[ -$isTableMissed -eq 1 ]]; then
       create_tables
+      echo "Tables was successfully created."
+      return 0
     else
       echo "Tables already exists."
     fi
@@ -73,8 +64,11 @@ query_to_database() {
 }
 
 drop_table_data() {
-  echo "Table cleaning..."
-  query_to_database "TRUNCATE $tb1, $tb2, $tb3, $tb4, $tb5, $tb6, $tb7" >/dev/null
+  echo "Truncating tables..."
+  local tbls="${tables[*]}"
+  query_to_database "TRUNCATE ${tbls// /, }" >/dev/null
+  echo "Done."
+  echo "Resetting sequences..."
   query_to_database "ALTER SEQUENCE category_name_id_seq RESTART;" >/dev/null
   query_to_database "ALTER SEQUENCE stop_and_search_id_seq RESTART;" >/dev/null
   query_to_database "ALTER SEQUENCE outcome_status_id_seq RESTART;" >/dev/null
@@ -90,7 +84,7 @@ build_project() {
 
 run_application() {
   if [[ "$selectedApi" == "all" ]]; then
-    for i in "${api[@]}"; do
+    for i in "${api[@]:1:3}"; do
       java -jar "$project_folder/target/crime.jar" -Dapi="$i" -Dfile="$project_folder/data/LondonStations.csv" -Dfrom=2019-01 -Dto=2019-05
     done
   elif [[ $selectedApi -eq 0 ]]; then
@@ -100,15 +94,8 @@ run_application() {
   fi
 }
 
-analyze() {
-  if [[ $anazyleQuery -eq 0 ]]; then
-    return 0;
-  fi
-  java -jar "$project_folder/target/crime.jar" -Dapi="$anazyleQuery" -Drows="$rows" -Dfile="$project_folder/sql/queries/"
-}
-
 parse_arguments() {
-  while getopts dbhr:q:f:w:t: opt "$@"; do
+  while getopts dbhf:w: opt "$@"; do
   case $opt in
     f)
     project_folder="$OPTARG"
@@ -127,16 +114,6 @@ parse_arguments() {
     b)
     build_project
     ;;
-    r)
-    rows=$OPTARG
-    ;;
-    q)
-    anazyleQuery="$OPTARG"
-    ;;
-    t)
-    print_table "$OPTARG"
-    exit 0
-    ;;   
     *)
     echo "Unknown argument."
     help
@@ -150,4 +127,3 @@ parse_arguments "$@"
 check_postgres
 create_tables_if_not_exists
 run_application
-analyze
