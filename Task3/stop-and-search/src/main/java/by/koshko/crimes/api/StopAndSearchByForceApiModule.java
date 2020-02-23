@@ -42,7 +42,7 @@ public class StopAndSearchByForceApiModule implements ApplicationApiModule {
             String startDate = parameters.getProperty(CommandLineParameters.FROM_OPTION);
             String endDate = parameters.getProperty(CommandLineParameters.TO_OPTION);
             DateRange dateRange = DateRange.build(startDate, endDate);
-            new ExecutionService<>(requestService, jsonToObjectMapper, persistenceService)
+            new ExecutionService<>(jsonToObjectMapper, persistenceService, requestService)
                     .execute(forces, dateRange);
         } catch (ServiceException | ApplicationException e) {
             logger.error(e.getMessage());

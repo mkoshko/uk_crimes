@@ -24,15 +24,16 @@ public class ExecutionService<T, U> {
     private ExecutorService persistProcessor = Executors.newFixedThreadPool(10);
     private BlockingQueue<Future<String>> tasks = new LinkedBlockingQueue<>(16);
     private AtomicInteger processedResponses = new AtomicInteger();
-    private HttpRequestService<U> requestService;
+    private HttpRequestService requestService = new HttpRequestService();
+    private HttpRequestUrlBuilder<U> requestUrlBuilder;
     private JsonArrayHandler<T> jsonArrayHandler;
     private int totalRequests = 0;
 
-    public ExecutionService(HttpRequestService<U> requestService,
-                            JsonToObjectMapper<T> jsonToObjectMapper,
-                            PersistenceService<T> persistenceService) {
-        this.requestService = requestService;
+    public ExecutionService(JsonToObjectMapper<T> jsonToObjectMapper,
+                            PersistenceService<T> persistenceService,
+                            HttpRequestUrlBuilder<U> httpRequestUrlBuilder) {
         jsonArrayHandler = new JsonArrayHandler<>(jsonToObjectMapper, persistenceService);
+        requestUrlBuilder = httpRequestUrlBuilder;
     }
 
     public void execute(Iterable<U> requestParams, Iterable<String> range) {
@@ -118,7 +119,14 @@ public class ExecutionService<T, U> {
                 totalRequests, processedResponses.get(), totalRequests - processedResponses.get()));
     }
 
-    private Future<String> sendRequest(U point, String date) {
-        return requestProcessor.submit(() -> requestService.sendRequest(point, date));
+    private Future<String> sendRequest(U u, String date) {
+        return requestProcessor.submit(() -> {
+            try {
+                return requestService.sendRequest(requestUrlBuilder.buildRequestUrl(u, date));
+            } catch (ServiceException e) {
+                logger.info(e.getMessage());
+            }
+            return null;
+        });
     }
 }

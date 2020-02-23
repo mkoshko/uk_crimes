@@ -1,7 +1,6 @@
 package by.koshko.crimes.service.request;
 
 import by.koshko.crimes.model.Force;
-import by.koshko.crimes.service.HttpRequestService;
 
 public class ForceHttpRequestService extends AbstractHttpRequestService<Force> implements HttpRequestService<Force> {
 

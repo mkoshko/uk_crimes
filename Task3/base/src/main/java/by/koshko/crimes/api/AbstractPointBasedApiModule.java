@@ -5,7 +5,7 @@ import by.koshko.crimes.service.ExecutionService;
 import by.koshko.crimes.service.JsonToObjectMapper;
 import by.koshko.crimes.service.PersistenceService;
 import by.koshko.crimes.service.exception.ApplicationException;
-import by.koshko.crimes.service.request.PointHttpRequestService;
+import by.koshko.crimes.service.request.PointBasedRequestUrlBuilder;
 import by.koshko.crimes.service.mapper.PointMapper;
 import by.koshko.crimes.util.CommandLineParameters;
 import by.koshko.crimes.util.CsvFileReader;
@@ -22,25 +22,25 @@ public abstract class AbstractPointBasedApiModule<T> implements ApplicationApiMo
 
     private Logger logger = LoggerFactory.getLogger(getClass());
     private PointMapper pointMapper;
-    private PointHttpRequestService requestService;
+    private PointBasedRequestUrlBuilder requestUrlBuilder;
     private JsonToObjectMapper<T> jsonToObjectMapper;
     private PersistenceService<T> persistenceService;
 
     public AbstractPointBasedApiModule(PointMapper pointMapper,
                                        JsonToObjectMapper<T> jsonToObjectMapper,
                                        PersistenceService<T> persistenceService,
-                                       PointHttpRequestService requestService) {
+                                       PointBasedRequestUrlBuilder requestUrlBuilder) {
         this.pointMapper = pointMapper;
-        this.requestService = requestService;
         this.jsonToObjectMapper = jsonToObjectMapper;
         this.persistenceService = persistenceService;
+        this.requestUrlBuilder = requestUrlBuilder;
     }
 
     @Override
     public void run(Properties parameters) {
         try {
             ExecutionService<T, Point> executionService
-                    = new ExecutionService<>(requestService, jsonToObjectMapper, persistenceService);
+                    = new ExecutionService<>(jsonToObjectMapper, persistenceService, requestUrlBuilder);
             DateRange dateRange = DateRange.build(
                     parameters.getProperty(CommandLineParameters.FROM_OPTION),
                     parameters.getProperty(CommandLineParameters.TO_OPTION));

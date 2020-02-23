@@ -4,7 +4,7 @@ import by.koshko.crimes.model.AvailableApi;
 import by.koshko.crimes.model.StopAndSearch;
 import by.koshko.crimes.service.JsonToObjectMapper;
 import by.koshko.crimes.service.PersistenceService;
-import by.koshko.crimes.service.request.PointHttpRequestService;
+import by.koshko.crimes.service.request.PointBasedRequestUrlBuilder;
 import by.koshko.crimes.service.mapper.PointMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,6 +17,6 @@ public class StopAndSearchByAreaApiModule extends AbstractPointBasedApiModule<St
                                         JsonToObjectMapper<StopAndSearch> jsonToObjectMapper,
                                         PersistenceService<StopAndSearch> persistenceService) {
         super(pointMapper, jsonToObjectMapper, persistenceService,
-                new PointHttpRequestService(AvailableApi.STOP_AND_SEARCH_BY_AREA.getApiUrl()));
+                new PointBasedRequestUrlBuilder(AvailableApi.STOP_AND_SEARCH_BY_AREA.getApiUrl()));
     }
 }
