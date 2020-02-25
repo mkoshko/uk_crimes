@@ -35,7 +35,7 @@ public class DateRange implements Iterable<String> {
         return new DateIterator();
     }
 
-    public static DateRange build(String startDate, String endDate) throws ApplicationException {
+    public static DateRange build(String startDate, String endDate) {
         if (nonNull(startDate) && nonNull(endDate)) {
             YearMonth yearMonthStart = parse(startDate);
             YearMonth yearMonthEnd = parse(endDate);
@@ -62,7 +62,7 @@ public class DateRange implements Iterable<String> {
         }
     }
 
-    private static YearMonth parse(String date) throws ApplicationException {
+    private static YearMonth parse(String date) {
         try {
             return YearMonth.parse(date);
         } catch (DateTimeParseException e) {
@@ -70,7 +70,7 @@ public class DateRange implements Iterable<String> {
         }
     }
 
-    private static void checkRange(YearMonth startDate, YearMonth endDate) throws ApplicationException {
+    private static void checkRange(YearMonth startDate, YearMonth endDate) {
         if (startDate.isAfter(endDate)) {
             String errMessage = String.format("Invalid date range [%s/%s].", startDate, endDate);
             throw new ApplicationException(errMessage);

@@ -1,9 +1,6 @@
 package by.koshko.crimes.service.exception;
 
-public class ApplicationException extends Exception {
-
-    public ApplicationException() {
-    }
+public class ApplicationException extends RuntimeException {
 
     public ApplicationException(String message) {
         super(message);

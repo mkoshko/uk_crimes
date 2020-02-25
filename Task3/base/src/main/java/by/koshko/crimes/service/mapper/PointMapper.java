@@ -16,10 +16,10 @@ import java.util.stream.Stream;
 @Component
 public class PointMapper implements RequestDataMapper<Point> {
 
+    Logger logger = LoggerFactory.getLogger(getClass());
     private static final int NAME_INDEX = 0;
     private static final int LONGITUDE_INDEX = 1;
     private static final int LATITUDE_INDEX = 2;
-    Logger logger = LoggerFactory.getLogger(PointMapper.class);
 
     @Override
     public List<Point> map(Stream<String> parameters) {

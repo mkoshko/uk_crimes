@@ -1,7 +1,7 @@
 package by.koshko.crimes.service;
 
 import by.koshko.crimes.service.exception.ServiceException;
-import by.koshko.crimes.service.jsonutil.JsonArrayHandler;
+import by.koshko.crimes.service.request.RequestService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,45 +14,45 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ExecutionService<T, U> {
+public class ExecutionService<T> {
 
     private Logger logger = LoggerFactory.getLogger(ExecutionService.class);
 
-    private static final int TASKS_LIMIT = 15;
+    private static final int REQUEST_THREADS = 10;
+    private static final int PERSIST_THREADS = 10;
+    private static final int REQUEST_LIMIT = 15;
 
-    private ExecutorService requestProcessor = Executors.newFixedThreadPool(10);
-    private ExecutorService persistProcessor = Executors.newFixedThreadPool(10);
-    private BlockingQueue<Future<String>> tasks = new LinkedBlockingQueue<>(16);
+    private ExecutorService requestExecutor = Executors.newFixedThreadPool(REQUEST_THREADS);
+    private ExecutorService persistExecutor = Executors.newFixedThreadPool(PERSIST_THREADS);
+    private BlockingQueue<Future<String>> tasks = new LinkedBlockingQueue<>();
+    private RequestService<T> requestService;
+    private JsonArrayHandler jsonArrayHandler;
     private AtomicInteger processedResponses = new AtomicInteger();
-    private HttpRequestService requestService = new HttpRequestService();
-    private HttpRequestUrlBuilder<U> requestUrlBuilder;
-    private JsonArrayHandler<T> jsonArrayHandler;
     private int totalRequests = 0;
 
-    public ExecutionService(JsonToObjectMapper<T> jsonToObjectMapper,
-                            PersistenceService<T> persistenceService,
-                            HttpRequestUrlBuilder<U> httpRequestUrlBuilder) {
-        jsonArrayHandler = new JsonArrayHandler<>(jsonToObjectMapper, persistenceService);
-        requestUrlBuilder = httpRequestUrlBuilder;
+    public ExecutionService(JsonArrayHandler jsonArrayHandler, RequestService<T> requestService) {
+        this.jsonArrayHandler = jsonArrayHandler;
+        this.requestService = requestService;
     }
 
-    public void execute(Iterable<U> requestParams, Iterable<String> range) {
-        persistProcessor.execute(() -> {
+    public void execute(Iterable<T> requestParams, Iterable<String> range) {
+        persistExecutor.execute(() -> {
             processTasksQueue();
-            persistProcessor.shutdown();
+            persistExecutor.shutdown();
         });
         range.forEach(rangeValue -> requestParams.forEach(requestParam -> {
+            logger.info("Sending request for {}.", requestParam);
             Future<String> task = sendRequest(requestParam, rangeValue);
             ++totalRequests;
             putTaskInQueue(task);
         }));
-        requestProcessor.shutdown();
+        requestExecutor.shutdown();
         waitForTermination();
         report();
     }
 
     private void waitForTermination() {
-        while (!persistProcessor.isTerminated()) {
+        while (!persistExecutor.isTerminated()) {
             sleepMillis(500);
         }
     }
@@ -73,21 +73,17 @@ public class ExecutionService<T, U> {
     }
 
     private void processResponse(String jsonResponse) {
-        try {
-            jsonArrayHandler.process(jsonResponse);
-            processedResponses.incrementAndGet();
-        } catch (ServiceException e) {
-            logger.error("Cannot process the response. {}", e.getMessage());
-        }
+        jsonArrayHandler.process(jsonResponse);
+        processedResponses.incrementAndGet();
     }
 
     private void processTasksQueue() {
-        while (!(requestProcessor.isShutdown() && tasks.isEmpty())) {
+        while (!(requestExecutor.isShutdown() && tasks.isEmpty())) {
             try {
                 Future<String> task = tasks.take();
                 String response = returnValueIfComplete(task);
                 if (response != null) {
-                    persistProcessor.execute(() -> processResponse(response));
+                    persistExecutor.execute(() -> processResponse(response));
                 }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -97,13 +93,17 @@ public class ExecutionService<T, U> {
 
     private void putTaskInQueue(Future<String> task) {
         try {
-            while (tasks.size() >= TASKS_LIMIT) {
+            while (tasks.size() >= REQUEST_LIMIT) {
                 sleepMillis(1);
             }
             tasks.put(task);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    private Future<String> sendRequest(T model, String date) {
+        return requestExecutor.submit(() -> requestService.sendRequest(model, date));
     }
 
     private void sleepMillis(long milliseconds) {
@@ -115,18 +115,7 @@ public class ExecutionService<T, U> {
     }
 
     private void report() {
-        System.out.println(String.format("Total requests: [%d]. Total success responses [%d]. Failed [%d].",
-                totalRequests, processedResponses.get(), totalRequests - processedResponses.get()));
-    }
-
-    private Future<String> sendRequest(U u, String date) {
-        return requestProcessor.submit(() -> {
-            try {
-                return requestService.sendRequest(requestUrlBuilder.buildRequestUrl(u, date));
-            } catch (ServiceException e) {
-                logger.info(e.getMessage());
-            }
-            return null;
-        });
+        logger.info("Total requests: [{}]. Total success responses [{}]. Failed [{}].",
+                totalRequests, processedResponses.get(), totalRequests - processedResponses.get());
     }
 }

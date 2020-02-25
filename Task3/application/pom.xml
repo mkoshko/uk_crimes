@@ -44,19 +44,14 @@
             <artifactId>base</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>by.koshko</groupId>-->
-<!--            <artifactId>stop-and-search</artifactId>-->
-<!--            <version>1.0-SNAPSHOT</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>by.koshko</groupId>
-            <artifactId>street-level-crimes</artifactId>
+            <artifactId>stop-and-search</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>by.koshko</groupId>
-            <artifactId>model</artifactId>
+            <artifactId>street-level-crimes</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

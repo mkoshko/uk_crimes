@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-class StreetCrimesPersistenceService implements PersistenceService<Crime> {
+class CrimesPersistenceService implements PersistenceService<Crime> {
 
     private CrimeDao crimeDao;
     private LocationPersistenceService locationPersistenceService;
@@ -19,10 +19,10 @@ class StreetCrimesPersistenceService implements PersistenceService<Crime> {
     private CategoryNameDao categoryNameDao;
 
     @Autowired
-    public StreetCrimesPersistenceService(CrimeDao crimeDao,
-                                          LocationPersistenceService locationPersistenceService,
-                                          OutcomeStatusDaoImpl outcomeStatusDao,
-                                          CategoryNameDao categoryNameDao) {
+    public CrimesPersistenceService(CrimeDao crimeDao,
+                                    LocationPersistenceService locationPersistenceService,
+                                    OutcomeStatusDaoImpl outcomeStatusDao,
+                                    CategoryNameDao categoryNameDao) {
         this.crimeDao = crimeDao;
         this.locationPersistenceService = locationPersistenceService;
         this.outcomeStatusDao = outcomeStatusDao;

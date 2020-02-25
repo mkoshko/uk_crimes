@@ -1,13 +1,13 @@
 package by.koshko.crimes.service.mapper;
 
 import by.koshko.crimes.model.Crime;
-import by.koshko.crimes.service.JsonToObjectMapper;
+import by.koshko.crimes.service.JsonToModelMapper;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class CrimeMapper implements JsonToObjectMapper<Crime> {
+public class CrimeMapper implements JsonToModelMapper<Crime> {
 
     private LocationMapper locationMapper;
     private OutcomeStatusMapper outcomeStatusMapper;

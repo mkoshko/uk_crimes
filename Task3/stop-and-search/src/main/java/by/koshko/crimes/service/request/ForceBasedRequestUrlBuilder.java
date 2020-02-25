@@ -1,23 +1,20 @@
 package by.koshko.crimes.service.request;
 
-import by.koshko.crimes.model.Point;
 import by.koshko.crimes.service.HttpRequestUrlBuilder;
 
-public class PointBasedRequestUrlBuilder implements HttpRequestUrlBuilder<Point> {
+public class ForceBasedRequestUrlBuilder implements HttpRequestUrlBuilder<String> {
 
     private final String url;
 
-    public PointBasedRequestUrlBuilder(String url) {
+    public ForceBasedRequestUrlBuilder(String url) {
         this.url = url;
     }
 
-    public String buildRequestUrl(Point point, String date) {
+    @Override
+    public String buildRequestUrl(String model, String date) {
         StringBuilder request = new StringBuilder(url)
                 .append("?")
-                .append("lat=").append(point.getLatitude())
-                .append("&")
-                .append("lng=").append(point.getLongitude());
-
+                .append("force=").append(model);
         if (date != null) {
             request.append("&").append("date=").append(date);
         }

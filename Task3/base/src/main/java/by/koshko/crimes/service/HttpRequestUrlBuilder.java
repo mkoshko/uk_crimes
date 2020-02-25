@@ -4,5 +4,5 @@ import by.koshko.crimes.model.Point;
 
 public interface HttpRequestUrlBuilder<T> {
 
-    String buildRequestUrl(T t, String date);
+    String buildRequestUrl(T model, String date);
 }

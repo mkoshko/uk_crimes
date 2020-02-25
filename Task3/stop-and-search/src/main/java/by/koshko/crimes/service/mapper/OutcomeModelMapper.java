@@ -1,12 +1,12 @@
 package by.koshko.crimes.service.mapper;
 
 import by.koshko.crimes.model.OutcomeObject;
-import by.koshko.crimes.service.JsonToObjectMapper;
+import by.koshko.crimes.service.JsonToModelMapper;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 @Service
-public class OutcomeObjectMapper implements JsonToObjectMapper<OutcomeObject> {
+public class OutcomeModelMapper implements JsonToModelMapper<OutcomeObject> {
 
     @Override
     public OutcomeObject map(JSONObject object) {

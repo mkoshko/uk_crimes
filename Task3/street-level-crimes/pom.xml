@@ -12,19 +12,11 @@
     <artifactId>street-level-crimes</artifactId>
 
     <dependencies>
-
         <dependency>
             <groupId>by.koshko</groupId>
             <artifactId>base</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>by.koshko</groupId>
-            <artifactId>model</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
-
 </project>

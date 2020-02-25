@@ -1,12 +1,12 @@
 package by.koshko.crimes.service.mapper;
 
 import by.koshko.crimes.model.Street;
-import by.koshko.crimes.service.JsonToObjectMapper;
+import by.koshko.crimes.service.JsonToModelMapper;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StreetMapper implements JsonToObjectMapper<Street> {
+public class StreetMapper implements JsonToModelMapper<Street> {
 
     private static final String ID = "id";
     private static final String NAME = "name";

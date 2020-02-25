@@ -1,13 +1,13 @@
 package by.koshko.crimes.service.mapper;
 
 import by.koshko.crimes.model.Location;
-import by.koshko.crimes.service.JsonToObjectMapper;
+import by.koshko.crimes.service.JsonToModelMapper;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class LocationMapper implements JsonToObjectMapper<Location> {
+public class LocationMapper implements JsonToModelMapper<Location> {
 
     private static final String STREET = "street";
     private static final String LATITUDE = "latitude";

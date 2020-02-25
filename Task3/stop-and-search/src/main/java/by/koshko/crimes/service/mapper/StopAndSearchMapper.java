@@ -1,7 +1,7 @@
 package by.koshko.crimes.service.mapper;
 
 import by.koshko.crimes.model.StopAndSearch;
-import by.koshko.crimes.service.JsonToObjectMapper;
+import by.koshko.crimes.service.JsonToModelMapper;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -10,13 +10,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 @Service
-public class StopAndSearchMapper implements JsonToObjectMapper<StopAndSearch> {
+public class StopAndSearchMapper implements JsonToModelMapper<StopAndSearch> {
 
     private LocationMapper locationMapper;
-    private OutcomeObjectMapper outcomeObjectMapper;
+    private OutcomeModelMapper outcomeObjectMapper;
 
     @Autowired
-    public StopAndSearchMapper(LocationMapper locationMapper, OutcomeObjectMapper outcomeObjectMapper) {
+    public StopAndSearchMapper(LocationMapper locationMapper, OutcomeModelMapper outcomeObjectMapper) {
         this.locationMapper = locationMapper;
         this.outcomeObjectMapper = outcomeObjectMapper;
     }
